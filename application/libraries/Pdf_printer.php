@@ -1,0 +1,415 @@
+<?php
+class Pdf_printer
+{
+	public $page;
+	public $total_page = 1;
+	public $current_page = 1;
+	public $page_width = 200;
+	public $page_height	= 282;
+	public $content_width	= 190;
+	public $row = 20;
+	public $header_rows = 4;
+	public $sub_total_row = 2;
+	public $footer_row = 4;
+	public $ex_row = 0;
+	public $total_row = 16;
+	public $row_height = 10;
+	public $font_size = 14;
+	public $title = "";
+	public $title_size = "h4";
+	public $content_border = 2;
+	public $pattern = array();
+	public $footer = true;
+	public $custom_header = '';
+	public $logo_position = "middle";
+	public $title_position = "center";
+	public $text_color = "text-orange"; //--- hilight text color class
+	
+	public $header_row	= array();
+
+	public $sub_header	= "";
+
+
+	public function __construct()
+	{
+		return true;
+	}
+
+
+
+
+
+	public function config(array $data)
+	{
+		foreach ($data as $key => $val)
+		{
+			$this->$key = $val;
+		}
+		if (!$this->footer)
+		{
+			$this->row += $this->footer_row;
+			$this->footer_row = 0;
+		}
+		$this->row -= ($this->sub_total_row + $this->ex_row + $this->header_rows);
+		$this->total_page = ceil($this->total_row / $this->row);
+		return true;
+	}
+
+
+
+
+	public function doc_header($pageTitle = 'print pages')
+	{
+		$header = "";
+		$header .= "<!DOCTYPE html>";
+		$header .= "	<html>";
+		$header .= "<head>";
+		$header .= "	<meta charset='utf-8'>";
+		$header .= "	<meta name='viewport' content='width=device-width, initial-scale=1.0'>";
+		$header .= "	<link rel='icon' href='" . base_url() . "assets/img/favicon.ico' type='image/x-icon' />";
+		$header .= "	<title>" . $pageTitle . "</title>";
+		$header .= "	<link href='" . base_url() . "assets/css/bootstrap_pdf.css' rel='stylesheet' />";
+		$header .= "	<link rel='stylesheet' href='" . base_url() . "assets/css/font-awesome.css' />";
+		$header .= "	<link href='" . base_url() . "assets/css/template.css' rel='stylesheet' />";
+		// $header .= '<link rel="preconnect" href="https://fonts.googleapis.com">';
+		// $header .= '<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>';
+		// $header .= '<link href="https://fonts.googleapis.com/css2?family=Sarabun:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800&display=swap" rel="stylesheet">';
+		$header .= "	<script src='" . base_url() . "assets/js/jquery.min.js'></script>";
+		$header .= "	<script src='" . base_url() . "assets/js/bootstrap.min.js'></script> ";
+		$header .= "	<style> ";
+		$header .= "		.page_layout{ border: solid 1px #AAA; border-radius:5px; 	} ";
+		$header .= "		@media print{ 	.page_layout{ border: none; } } ";
+		$header .= " 		.table > tbody > tr > td { border-top:0px; border-left:solid 1px #555555;} ";
+		$header .= "		.table > tbody > tr > td:last-child { border-right:solid 1px #555555;} ";
+		$header .= "	</style>";
+		$header .= "	</head>";
+		$header .= "	<body>";
+		$header .= "<div style='width:100%'>";
+
+		return $header;
+	}
+
+
+
+
+
+	public function add_title($title)
+	{
+		$this->title = $title;
+	}
+
+
+
+
+
+
+	public function set_pattern($pattern) //// กำหนดรูปแบบ CSS ให้กับ td
+	{
+		$this->pattern = $pattern;
+	}
+
+
+
+
+
+
+	public function print_sub_total(array $data)
+	{
+		$rs = '<table class="table" style="margin-bottom:0px;">';
+		foreach ($data as $value)
+		{
+			foreach ($value as $val)
+			{
+				$rs .= "<tr style='height:" . $this->row_height . "mm; line-height:" . $this->row_height . "mm;'>";
+				$rs .= $val;
+				$rs .= "</tr>";
+			}
+		}
+		$rs .= "</table>";
+		return $rs;
+	}
+
+
+
+
+
+	public function add_subheader($sub_header)
+	{
+		$this->sub_header = $this->thead($sub_header);
+	}
+
+
+
+
+
+	public function thead(array $dataset)
+	{
+		$thead	= "<table class='table' style='table-layout:fixed; margin-bottom:-2px;'>";
+		$thead 	.= "<thead>";
+		$thead	.= "<tr style='height:" . $this->row_height . "mm; line-height:" . $this->row_height . "mm; font-size:10px;'>";
+		foreach ($dataset as $data)
+		{
+			$value 	= $data[0];
+			$css		= $data[1];
+			$thead 	.= "<th style='" . $css . "'>" . $value . "</th>";
+		}
+		$thead	.= "</tr>";
+		$thead 	.= "</thead>";
+		return $thead;
+	}
+
+
+
+
+
+	public function doc_footer()
+	{
+		return "</div></body></html>";
+	}
+
+
+
+
+
+	public function add_header(array $data)
+	{
+		$i = 0;
+		$count = 0;
+		foreach ($data as $label => $value)
+		{
+			$this->header_row[$i] = array($label => $value);
+			$i++;
+			$count++;
+		}
+
+		$this->header_rows = ceil($count / 2);
+		return true;
+	}
+
+
+
+
+
+
+	public function print_header()
+	{
+		$rd = $this->header_row;
+		$r = count($rd);
+		$height = ($this->header_rows * $this->row_height) + 1;
+		$i	= 0;
+		$v  = 1;
+		$x = 1;
+		$header = "<div style='width:" . $this->content_width . "mm; min-height:" . $height . "mm; margin:auto; margin-bottom:2mm; border:solid 2px #ccc; border-radius: 10px;' >";
+		while ($i < $r)
+		{
+			$od = ($x) % 2;
+			$width = ($od == 1) ? '60%' : '40%';
+			foreach ($rd[$i] as $label => $value)
+			{
+				//$width = '50%';
+				$header .= '<div style="font-size:12px; width:' . $width . '; min-height:10mm; line-height:10mm; float:left; padding-left:10px; padding-right:10px; white-space:nowrap; overflow:hidden;">';
+				$header .=  $label . ' : ' . $value; //'<input type="text" class="print-row" value="'.$label.' : &nbsp;&nbsp;'.$value.'" />';
+				$header .= '</div>';
+			}
+			$x++;
+			$i++;
+			$v++;
+		}
+		$header .= "</div>";
+		return $header;
+	}
+
+
+
+	public function add_custom_header($html)
+	{
+		$this->custom_header = $html;
+	}
+
+
+
+
+	public function print_custom_header()
+	{
+		$height = ($this->header_rows * $this->row_height) + 1;
+		$sc = '<div style="width:' . $this->content_width . 'mm; min-height:' . $height . 'mm; margin:auto; margin-bottom:2mm; border:solid 2px #ccc; border-radius: 10px;">';
+		$sc .= $this->custom_header;
+		$sc .= '</div>';
+		return $sc;
+	}
+
+
+
+
+
+
+
+	public function add_content($data)
+	{
+		$content = "<div style='width:" . $this->content_width . "mm; margin:auto; margin-bottom:2mm; border:solid 2px #ccc; border-radius: 10px;' >";
+		$content .= $data;
+		$content .= "</div>";
+		return $content;
+	}
+
+
+
+
+
+
+
+	public function page_start()
+	{
+		$page_break = "page-break-after:always;";
+		if ($this->current_page == $this->total_page)
+		{
+			$page_break = "";
+		}
+		return "<div class='page_layout' style='width:" . $this->page_width . "mm; padding-top:0mm; height:" . $this->page_height . "mm; margin:auto; " . $page_break . "'>"; //// page start
+	}
+
+
+
+
+
+
+	public function page_end()
+	{
+		return "</div><div class='hidden-print' style='height: 5mm; width:" . $this->page_width . "'></div>";
+	}
+
+
+
+
+
+
+	public function top_page()
+	{
+		$top = "";
+		$top .= "<div style='width:" . $this->content_width . "mm; height:" . $this->row_height . "mm; margin:auto; margin-bottom:2mm;'>"; //// top start
+		$top .= "<div style='width:80%; line-height:" . $this->row_height . "mm; float:left'><" . $this->title_size . " style='margin:0px;'>" . $this->title . "</" . $this->title_size . "></div>";
+		$top .= "<div style='width:20%; line-height:" . $this->row_height . "mm; float:left; text-align:right;'><span style='position:relative; bottom: 0mm;'>หน้า " . $this->current_page . "/" . $this->total_page . "</span></div>";
+		$top .= "</div>"; /// top end;
+		if ($this->header_rows)
+		{
+
+			$top .= $this->custom_header == '' ? $this->print_header() : $this->print_custom_header();
+		}
+		return $top;
+	}
+
+
+
+
+
+
+	public function content_start()
+	{
+		$height = 150; //($this->row + $this->sub_total_row) * $this->row_height;
+		$border = $this->content_border == 0 ? '' : "border:solid 0px #555555;";
+		return  "<div style='width:" . $this->content_width . "mm; height:" . $height . "mm; margin:auto; margin-bottom:0mm; margin-top:2mm; " . $border . " border-radius: 0px;'>";
+	}
+
+
+
+
+
+
+
+	public function content_end()
+	{
+		return "</div>";
+	}
+
+
+
+
+
+	public function print_row($data)
+	{
+		$row = "<tr style='font-size:" . $this->font_size . "px; height:" . $this->row_height . "mm;'>";
+		$pattern = $this->pattern;
+		if (count($pattern) == 0)
+		{
+			$c = count($data);
+			while ($c > 0)
+			{
+				array_push($pattern, "");
+				$c--;
+			}
+		}
+		foreach ($data as $n => $value)
+		{
+			$row .= "<td class='middle' style='" . $pattern[$n] . "'>" . $value . "</td>";
+		}
+		$row .= "</tr>";
+		return $row;
+	}
+
+
+
+
+	public function table_start()
+	{
+		return $this->sub_header;
+	}
+
+
+
+
+
+	public function table_end()
+	{
+		return "</table>";
+	}
+
+
+
+
+
+
+	public function set_footer(array $data)
+	{
+		if (!$this->footer)
+		{
+			return false;
+		}
+		else
+		{
+			$c = count($data);
+			$box_width = 100 / $c;
+			$height = $this->footer_row * $this->row_height;
+			$row1 = $this->row_height;
+			$row2 = 5;
+			$row4 = 8;
+			$row3 = $height - ($row1 + $row2 + $row4) - 2;
+			$footer = "<div style='width:190mm; height:" . $height . "mm; margin:auto;'>";
+			foreach ($data as $n => $value)
+			{
+				$footer .= "<div style='width:" . $box_width . "%; height:" . $height . "mm; text-align:center; float:left;'>";
+				$footer .= "<span style='width:100%; height:" . $row1 . "mm; text-align:center;'>" . $value[0] . "</span>";
+				$footer .= "<div style='width:100%; height:" . ($this->footer_row - 1) * $this->row_height . "mm; text-align:center; border: solid 2px #ccc; padding-left:10px; padding-right:10px; border-radius:10px;'>";
+				$footer .= "<span style='width:100%; height: " . $row2 . "mm; text-align:center;font-size:8px; float:left;'>" . $value[1] . "</span>";
+				$footer .= "<span style='width:100%; height: " . $row3 . "mm; text-align:center; padding-left:5px; padding-right:5px; border-bottom:dotted 1px #ccc; float:left; padding:10px;'></span>";
+				$footer .= "<span style='width:100%; height: " . $row4 . "mm; text-align:center; float:left; padding-top: 10px;'>" . $value[2] . "</span>";
+				$footer .= "</div>";
+				$footer .= "</div>";
+			}
+			$footer .= "</div>";
+			$this->footer = $footer;
+		}
+	}
+
+
+
+
+
+	public function print_barcode($barcode, $css = "")
+	{
+		if ($css == "")
+		{
+			$css = "width: 100px;";
+		}
+		return "<img src='" . base_url() . "assets/barcode/barcode.php?text=" . $barcode . "' style='" . $css . "' />";
+	}
+} //// end class

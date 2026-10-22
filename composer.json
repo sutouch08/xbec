@@ -1,0 +1,9 @@
+
+{	
+	"require": {
+		"php": "^8.2",
+    "mpdf/mpdf": "^8.2",
+    "phpoffice/phpspreadsheet": "^3.0",
+    "openspout/openspout": "^4.0"
+	}
+}

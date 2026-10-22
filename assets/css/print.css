@@ -1,0 +1,45 @@
+.text-orange {
+	color:orange;
+}
+
+.text-red {
+	color:#C0392B;
+}
+
+.text-green {
+	color:#28B463;
+}
+
+.text-blue {
+	color:#33B2FF;
+}
+
+.text-purple {
+	color:#910DDE;
+}
+
+.company-logo {
+	max-height: 38px;
+}
+
+@media print {
+	.text-orange {
+		color:orange !important;
+	}
+
+	.text-red {
+		color:#C0392B !important;
+	}
+
+	.text-green {
+		color:#28B463 !important;
+	}
+
+	.text-blue {
+		color:#33B2FF !important;
+	}
+
+	.text-purple {
+		color:#910DDE !important;
+	}
+}

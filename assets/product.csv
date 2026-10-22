@@ -1,0 +1,6 @@
+id_product,product_code,product_name,product_name_en,product_cost,product_price,default_category_id,description,description_en,active,show,under_zero,date_add,date_upd
+1,KFB-S018,เสื้อกีฬา,sport shirt,0.00,0.00,3,,,1,1,default,2015-04-09 15:25:03,2015-04-20 14:10:34
+2,KFB-S019,เสื้อกีฬาxx,sportxx,100.00,165.00,2,xxxxxxx,xxxxxxx,0,0,default,2015-04-30 11:47:28,2015-04-30 11:47:28
+3,KFB-S052,เสื้อกีฬาพิมพ์ลาย,,100.15,365.00,3,0,0,1,1,default,2015-04-28 14:09:52,2015-04-28 14:09:52
+4,KFB-S020,เสื้อยืด,,100.00,300.00,3,0,0,1,1,default,2015-04-28 14:11:20,2015-04-28 14:11:20
+5,KFB-S021,เสื้อเก่าพิมพ์ลาย,เสื้อเก่าพิมพ์ลาย,90.00,200.00,3,เสื้อเก่าคลาสสิค ราคาแพง,เสื้อเก่าคลาสสิค ราคาแพง,1,1,default,2015-04-28 14:17:30,2015-04-28 14:17:30

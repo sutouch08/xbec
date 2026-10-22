@@ -1,0 +1,135 @@
+#import-modal .modal-header {
+    background: linear-gradient(135deg, #1a7abf 0%, #0e5a8a 100%);
+    border-radius: 6px 6px 0 0;
+    padding: 18px 20px;
+  }
+
+  #import-modal .modal-header h4 {
+    color: #fff;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    margin: 0;
+  }
+
+  #import-modal .modal-header .close {
+    color: #fff;
+    opacity: 0.8;
+    font-size: 22px;
+    margin-top: -2px;
+  }
+
+  #import-modal .modal-header .close:hover {
+    opacity: 1;
+  }
+
+  #import-modal .modal-content {
+    border-radius: 6px;
+    border: none;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+  }
+
+  #import-modal .modal-body {
+    padding: 28px 24px 20px;
+  }
+
+  #import-modal .modal-footer {
+    background: #f8f9fa;
+    border-top: 1px solid #e9ecef;
+    border-radius: 0 0 6px 6px;
+    padding: 14px 20px;
+  }
+
+  #import-drop-zone {
+    border: 2px dashed #adb5bd;
+    border-radius: 8px;
+    padding: 36px 20px;
+    text-align: center;
+    cursor: pointer;
+    transition: border-color 0.2s, background 0.2s;
+    background: #f8fbff;
+  }
+
+  #import-drop-zone:hover,
+  #import-drop-zone.dragover {
+    border-color: #1a7abf;
+    background: #eaf4ff;
+  }
+
+  #import-drop-zone .drop-icon {
+    font-size: 48px;
+    color: #1a7abf;
+    margin-bottom: 10px;
+    display: block;
+  }
+
+  #import-drop-zone .drop-title {
+    font-size: 15px;
+    font-weight: 600;
+    color: #343a40;
+  }
+
+  #import-drop-zone .drop-sub {
+    font-size: 12px;
+    color: #6c757d;
+    margin-top: 4px;
+  }
+
+  #import-file-info {
+    display: none;
+    margin-top: 16px;
+    padding: 10px 14px;
+    background: #e8f5e9;
+    border: 1px solid #a5d6a7;
+    border-radius: 6px;
+    align-items: center;
+    gap: 10px;
+  }
+
+  #import-file-info .file-icon {
+    font-size: 22px;
+    color: #2e7d32;
+  }
+
+  #import-file-info .file-name {
+    font-size: 13px;
+    font-weight: 600;
+    color: #1b5e20;
+    word-break: break-all;
+  }
+
+  #import-file-info .file-size {
+    font-size: 11px;
+    color: #4caf50;
+  }
+
+  #import-file-info .btn-remove-file {
+    margin-left: auto;
+    background: none;
+    border: none;
+    color: #c62828;
+    font-size: 16px;
+    cursor: pointer;
+    padding: 0 4px;
+  }
+
+  #import-progress-wrap {
+    display: none;
+    margin-top: 16px;
+  }
+
+  #import-progress-wrap .progress {
+    height: 10px;
+    border-radius: 10px;
+    margin-bottom: 4px;
+  }
+
+  #import-progress-wrap .progress-bar {
+    border-radius: 10px;
+    transition: width 0.3s ease;
+  }
+
+  #import-progress-wrap .progress-label {
+    font-size: 11px;
+    color: #6c757d;
+    text-align: right;
+  }  
