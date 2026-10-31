@@ -1,14 +1,14 @@
 <?php
+use OpenSpout\Writer\XLSX\Writer;
+use OpenSpout\Common\Entity\Row;
+
 class Check_transection_document extends PS_Controller
 {
   public $menu_code = 'REDOCNUM';
 	public $menu_group_code = 'RE';
   public $menu_sub_group_code = NULL;
 	public $title = 'Report Check Transection Document';
-  private $host = "odbc:SAPHANA";
-  private $user = "SYSTEM";
-  private $pwd = "BXSbec2022";
-
+  
   public function __construct()
   {
     parent::__construct();
@@ -99,7 +99,6 @@ class Check_transection_document extends PS_Controller
       }
     }
 
-
     $arr = array(
       'status' => 'success',
       'data' => ! empty($ds) ? $ds : array(['nodata' => 'nodata'])
@@ -108,8 +107,136 @@ class Check_transection_document extends PS_Controller
     echo json_encode($arr);
   }
 
-
   public function do_export()
+  {
+    $from_date = $this->input->post('from_date');
+    $to_date = $this->input->post('to_date');
+    $webCode = $this->input->post('webCode');
+    $soCode = $this->input->post('soCode');
+    $saleId = $this->input->post('saleId');
+    $customerCode = $this->input->post('customerCode');
+    $token = $this->input->post('token');
+
+    $qr = $this->select_query($this->config->item('hana_database'));
+
+    if (! empty($from_date) && ! empty($to_date))
+    {
+      $qr .= "AND T5.[DocDate] >= '" . from_date($from_date) . "' ";
+      $qr .= "AND T5.[DocDate] <= '" . to_date($to_date) . "' ";
+    }
+    else
+    {
+      $qr .= "AND T5.[DocDate] >= '" . date('Y-m-01') . "' ";
+      $qr .= "AND T5.[DocDate] <= '" . date('Y-m-t') . "' ";
+    }
+
+    if (! empty($webCode))
+    {
+      $qr .= "AND T5.[U_WEBORDER] LIKE '%{$webCode}%' ";
+    }
+
+    if (! empty($soCode))
+    {
+      $qr .= "AND T1.[DocNum] LIKE '%{$soCode}%' ";
+    }
+
+    if (! empty($customerCode))
+    {
+      $qr .= "AND T5.[CardCode] LIKE '%{$customerCode}%' ";
+    }
+
+    if (! empty($saleId) && $saleId != 'all')
+    {
+      $qr .= "AND T1.[SlpCode] = '{$saleId}' ";
+    }
+
+    $qr .= $this->group_by_query();
+
+    $this->load->library('hana');    
+    $conn = $this->hana->connect();
+    $result = odbc_exec($conn, $this->hana->SQLtoHANA($qr));
+
+    //---  Report title
+    $report_title = "Report Check Transection Document : " . date('d/m/Y H:i') . ")";
+    $header = [
+      '#', 
+      'WO#', 
+      'SO#', 
+      'PK#', 
+      'INV Date', 
+      'Prefix', 
+      'INV#', 
+      'Code', 
+      'Customer', 
+      'Sub Total', 
+      'VAT Total', 
+      'Grand Total', 
+      'Sales Employee'
+    ];
+
+    $tempFile = tempnam(sys_get_temp_dir(), 'check_transection_document_');
+    $fileName = 'ReportCheckTransectionDocument-' . date('Ymd') . '.xlsx';
+
+    try 
+    {
+      $writer = new Writer();
+      $writer->openToFile($tempFile);
+      $writer->addRow(Row::fromValues([$report_title]));      
+      $writer->addRow(Row::fromValues($header));
+      $sheet = $writer->getCurrentSheet();
+      $sheet->setColumnWidth(5, 1);
+      $sheet->setColumnWidthForRange(15, 2, 5);
+      $sheet->setColumnWidth(8, 6);
+      $sheet->setColumnWidthForRange(12, 7, 8);
+      $sheet->setColumnWidth(60, 9);
+      $sheet->setColumnWidthForRange(15, 10, 12);
+      $sheet->setColumnWidth(20, 13);
+
+      if($result)
+      {
+        $no = 0;
+
+        while ($row = odbc_fetch_object($result))
+        {
+          $no++;
+          
+          $writer->addRow(Row::fromValues([
+            $no,
+            $row->U_WEBORDER,           
+            $row->SOPREFIX .' ' .$row->SOCODE,
+            $row->PKPREFIX .' ' .$row->PKCODE,
+            thai_date($row->IVDATE),
+            $row->IVPREFIX,
+            (int) $row->IVCODE,
+            $row->CODE,
+            $row->CUSTOMER,
+            round((float) $row->SUBTOTAL, 2),
+            round((float) $row->VATTOTAL, 2),
+            round((float) $row->GRANDTOTAL, 2),
+            $row->SLPNAME
+          ]));
+        }       
+      }
+      
+      $writer->close();
+      setToken($token);
+      while(ob_get_level() > 0) ob_end_flush();
+      header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+      header('Content-Disposition: attachment; filename="' . $fileName . '"');
+      readfile($tempFile);
+    }
+    finally
+    {
+      if (file_exists($tempFile)) 
+      {
+        unlink($tempFile);
+      }
+    }
+    
+    exit;
+  }
+
+  public function do_exportx()
   {
     $from_date = $this->input->post('from_date');
     $to_date = $this->input->post('to_date');

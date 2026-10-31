@@ -1,5 +1,6 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
+use OpenSpout\Reader\XLSX\Reader;
 
 class Discount_rule extends PS_Controller
 {
@@ -68,7 +69,7 @@ class Discount_rule extends PS_Controller
 		
     if($this->pm->can_add)
     {
-      $ds = json_decode($this->input->post('data'));			
+      $ds = json_decode($this->input->post('data') ?? '{}');			
 
 			if(empty($ds))
 			{
@@ -496,7 +497,7 @@ class Discount_rule extends PS_Controller
 		
 		if ($this->pm->can_edit)
 		{
-			$ds = json_decode($this->input->post('data'));
+			$ds = json_decode($this->input->post('data') ?? '{}');
 
 			if (empty($ds))
 			{
@@ -1347,7 +1348,7 @@ class Discount_rule extends PS_Controller
 		echo $sc === TRUE ? 'success' : $this->error;
 	}
 
-	public function get_sku_list()
+	public function get_sku_listx()
 	{
 		$sc = TRUE;
 		$this->load->library('excel');
@@ -1471,19 +1472,166 @@ class Discount_rule extends PS_Controller
 		echo json_encode($arr);
 	}
 
+
+	public function get_sku_list()
+	{
+		$sc = TRUE;
+
+		if( ! isset($_FILES['uploadFile']))
+		{
+			$sc = FALSE;
+			$this->error = "Upload file not found";
+		}
+
+		if($sc === TRUE)
+		{
+			$file = 'uploadFile';
+			$path = $this->config->item('upload_path') . 'discount_rule/';
+
+			$config = array(
+				"allowed_types" => "xlsx",
+				"upload_path" => $path,
+				"file_name"	=> 'Import-discount-sku',
+				"max_size" => 5120,
+				"overwrite" => TRUE
+			);
+
+			$this->load->library("upload", $config);
+
+			if (! $this->upload->do_upload($file))
+			{
+				$sc = FALSE;
+				$this->error = $this->upload->display_errors();
+			}
+		}
+
+		$ds = [];
+		$setPrice = [];
+
+		if($sc === TRUE)
+		{
+			$info = $this->upload->data();
+			$reader = new Reader();
+			$reader->open($info['full_path']);
+			$sheet = $reader->getSheetIterator()->current();
+			$isFirstRow = TRUE;
+			$j = 1;
+			$k = 1;
+			$items = [];
+
+			foreach ($sheet->getRowIterator() as $row)
+			{
+				if ($isFirstRow === TRUE)
+				{					
+					$cells = $row->getCells();
+					$a = strtolower(isset($cells[0]) ? trim($cells[0]->getValue() ?? '') : '');
+					$b = strtolower(isset($cells[1]) ? trim($cells[1]->getValue() ?? '') : '');
+
+					if($a !== 'itemcode' || $b !== 'sellprice')
+					{
+						$sc = FALSE;
+						$this->error = "Invalid file format Column A1 must be 'ItemCode' and Column B1 must be 'SellPrice'";
+						break;
+					}
+
+					$isFirstRow = FALSE;
+					continue;
+				}
+
+				$cells = $row->getCells();
+				$code = trim($cells[0]->getValue() ?? '');
+				$sellPrice = round(floatval($cells[1]->getValue() ?? 0), 2);
+
+				if (! empty($code))
+				{
+					if(empty($items[$j][$code]))
+					{
+						$items[$j][$code] = $code;
+						$setPrice[$code] = $sellPrice;
+						$k++;
+
+						if ($k == 20)
+						{
+							$j++;
+							$k = 1;
+						}
+					}
+				}
+			} //--- foreach row
+
+			$reader->close();
+
+			if($sc === TRUE)
+			{
+				if (! empty($items))
+				{
+					foreach ($items as $cs)
+					{
+						$list = $this->get_items($cs);
+
+						if (! empty($list))
+						{
+							foreach ($list as $rs)
+							{
+								$ds[] = (object) [
+									'id' => $rs->id,
+									'code' => $rs->code,
+									'name' => $rs->name,
+									'price' => number($rs->price, 2),
+									'sellPrice' => isset($setPrice[$rs->code]) ? $setPrice[$rs->code] : 0
+								];
+							}
+						}
+					} //--- foreach items
+				}
+				else
+				{
+					$sc = FALSE;
+					$this->error = "No items found in the uploaded file";
+				}
+			}			
+		} //--- if sc
+
+		$arr = array(
+			'status' => $sc === TRUE ? 'success' : 'error',
+			'message' => $sc === TRUE ? 'success' : $this->error,
+			'data' => $sc === TRUE ? $ds : []
+		);
+
+		echo json_encode($arr);
+	}
+
+	
+	public function get_items(array $ds = array())
+	{
+		if (! empty($ds))
+		{
+			$rs = $this->db->select('id, code, name, price')->where_in('code', $ds)->where('status', 1)->get('products');
+
+			if ($rs->num_rows() > 0)
+			{
+				return $rs->result();
+			}
+		}
+
+		return NULL;
+	}
+
 	public function get_customer_list()
 	{
 		$sc = TRUE;
-		$this->load->library('excel');
-		$file = isset($_FILES['uploadFile']) ? $_FILES['uploadFile'] : FALSE;
-		$ds = array(); //---- ได้เก็บข้อมูล
 
-		if ($file !== FALSE)
+		if( ! isset($_FILES['uploadFile']))
 		{
-			$path = $this->config->item('upload_path') . 'discount_rule/';
-			$file	= 'uploadFile';
+			$sc = FALSE;
+			$this->error = "Upload file not found";
+		}
 
-			$config = array(   // initial config for upload class
+		if($sc === TRUE)
+		{
+			$file = 'uploadFile';
+			$path = $this->config->item('upload_path') . 'discount_rule/';
+			$config = array(
 				"allowed_types" => "xlsx",
 				"upload_path" => $path,
 				"file_name"	=> 'Import-discount-customer',
@@ -1498,107 +1646,79 @@ class Discount_rule extends PS_Controller
 				$sc = FALSE;
 				$this->error = $this->upload->display_errors();
 			}
+		}
 
-			if ($sc === TRUE)
+		$ds = [];
+		
+		if($sc === TRUE)
+		{
+			$info = $this->upload->data();
+			$reader = new Reader();
+			$reader->open($info['full_path']);
+			$sheet = $reader->getSheetIterator()->current();
+			$j = 1;
+			$k = 1;
+			$items = [];
+			$isFirstRow = TRUE;
+
+			foreach ($sheet->getRowIterator() as $row)
 			{
-				$info = $this->upload->data();
-				$excel = PHPExcel_IOFactory::load($info['full_path']);
-				$excel->setActiveSheetIndex(0);
-
-				$sheet	= $excel->getSheet(0);
-
-				if (empty($sheet))
+				if ($isFirstRow)
 				{
-					$sc = FALSE;
-					$this->error = "Cannot read file or file not contain any data";
+					$isFirstRow = FALSE;
+					continue;
 				}
 
-				if ($sc === TRUE)
+				$cells = $row->getCells();
+				$code = trim($cells[0]->getValue() ?? '');
+
+				if( ! empty($code))
 				{
-					$rows = $sheet->getHighestRow();
-
-					$i = 1;
-					$j = 1;
-					$k = 1;
-
-					$items = [];
-
-					while ($i <= $rows)
+					if(empty($items[$j][$code]))
 					{
-						if ($i > 1)
+						$items[$j][$code] = $code;
+						$k++;
+
+						if($k == 20)
 						{
-							$code = $sheet->getCell("A{$i}")->getValue();
-
-							if (! empty($code))
-							{
-								if (empty($items[$j][$code]))
-								{
-									$items[$j][$code] = $code;
-
-									$k++;
-
-									if ($k == 20)
-									{
-										$j++;
-										$k = 1;
-									}
-								}
-							}
-
-							$i++;
-						}
-						else
-						{
-							$i++;
+							$j++;
+							$k = 1;
 						}
 					}
-
-					if (! empty($items))
-					{
-						foreach ($items as $cs)
-						{
-							$list = $this->get_customers($cs);
-
-							if (! empty($list))
-							{
-								foreach ($list as $rs)
-								{
-									$ds[] = $rs;
-								}
-							}
-						}
-					}
-				} //--- $sc
+				}
 			}
-		}
-		else
-		{
-			$sc = FALSE;
-			$this->error = "Upload file not found";
-		}
+
+			$reader->close();
+
+			if( ! empty($items))
+			{
+				foreach($items as $cs)
+				{
+					$list = $this->get_customers($cs);
+
+					if( ! empty($list))
+					{
+						foreach($list as $rs)
+						{
+							$ds[] = $rs;
+						}
+					}
+				} //--- end foreach $items
+			}
+			else 
+			{
+				$sc = FALSE;
+				$this->error = "No valid customer codes found in the uploaded file";
+			}
+		} //--- end if $sc === TRUE
 
 		$arr = array(
 			'status' => $sc === TRUE ? 'success' : 'failed',
 			'message' => $sc === TRUE ? 'success' : $this->error,
-			'data' => $ds
+			'data' => $sc === TRUE ? $ds : []
 		);
 
 		echo json_encode($arr);
-	}
-
-	public function get_items(array $ds = array())
-	{
-		if (! empty($ds))
-		{
-			$rs = $this->db->select('id, code, name, price')->where_in('code', $ds)->where('status', 1)->get('products');
-
-			if ($rs->num_rows() > 0)
-			{
-				return $rs->result();
-			}
-		}
-
-		return NULL;
 	}
 
 	public function get_customers(array $ds = array())

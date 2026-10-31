@@ -3,6 +3,7 @@ function thai_date($date, $time = FALSE, $sp = '-')
 {
   $sp = $sp === '' ? '-' : $sp;
   $format = $time === TRUE ? 'd'.$sp.'m'.$sp.'Y'.' H:i:s' : 'd'.$sp.'m'.$sp.'Y';
+	
   if(empty($date))
   {
     $date = date('d-m-Y');
@@ -107,22 +108,24 @@ function to_date($date = '')
   }
 }
 
-function select_years($se = '')
+function select_years(string $selected = '')
 {
-	$sc 		= '';
+	$options = "";
 	$length	= 5;
 	$startYear = getConfig('START_YEAR');
-  $y = ($se === '' OR $se === NULL) ? $startYear : $se;
+	$startYear = empty($startYear) ? intval(date('Y')) - $length : intval($startYear);
+	$y = $selected === ''  ? $startYear : intval($selected);
 	$year = ($y - $length) < $startYear ? $startYear : $y - $length;
 	$lastYear = date('Y') + $length;
-	while( $year <= $lastYear )
+
+	while ($year <= $lastYear)
 	{
-    $is_select = ($year == $se) ? 'selected' : '';
-		$sc .= '<option value="'.$year.'" '.$is_select.'>'.$year.'</option>';
+		$is_select = ($year == $selected) ? 'selected' : '';
+		$options .= '<option value="' . $year . '" ' . $is_select . '>' . $year . '</option>';
 		$year++;
 	}
 
-	return $sc;
+	return $options;
 }
 
 function selectHour($se = '')

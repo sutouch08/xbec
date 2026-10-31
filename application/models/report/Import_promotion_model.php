@@ -72,7 +72,7 @@ class Import_promotion_model extends CI_Model
 
   public function get_division_list()
   {
-    $rs = $this->db->select('C AS division')->group_by('C')->get($this->tb);
+    $rs = $this->db->select('C AS division')->group_by('C')->order_by('C', 'ASC')->get($this->tb);
 
     if($rs->num_rows() > 0)
     {
@@ -85,7 +85,7 @@ class Import_promotion_model extends CI_Model
 
   public function get_sales_list()
   {
-    $rs = $this->db->select('D AS sales_emp')->group_by('D')->get($this->tb);
+    $rs = $this->db->select('D AS sales_emp')->group_by('D')->order_by('D', 'ASC')->get($this->tb);
 
     if($rs->num_rows() > 0)
     {

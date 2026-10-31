@@ -35,7 +35,7 @@
 	  <div class="row">
 	    <div class="col-lg-3 col-md-3 col-sm-4 col-xs-12"><span class="form-control left-label">Default Warehouse</span></div>
 	    <div class="col-lg-4 col-md-6 col-sm-6 col-xs-12">
-	      <select class="width-100" id="default-warehouse" name="DEFAULT_WAREHOUSE">
+	      <select class="form-control input-sm" id="default-warehouse" name="DEFAULT_WAREHOUSE">
 	        <?php echo select_warehouse($DEFAULT_WAREHOUSE); ?>
 	      </select>
 	    </div>
@@ -53,3 +53,7 @@
 	    </div>
 	  </div>
 	</form>
+
+	<script>
+	  $('#default-warehouse').select2();
+	</script>

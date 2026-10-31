@@ -1,5 +1,8 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
+use OpenSpout\Writer\XLSX\Writer;
+use OpenSpout\Common\Entity\Row;
+
 class Item_promotions extends PS_Controller 
 {
   public $menu_code = 'REPROTM';
@@ -28,13 +31,13 @@ class Item_promotions extends PS_Controller
     ini_set('max_execution_time', 300); // 5 minutes
 
     $ds = [];
-    $code = trim($this->input->post('code'));
-    $name = trim($this->input->post('name'));
-    $promotionStatus = $this->input->post('promotionStatus');
-    $ruleStatus = $this->input->post('ruleStatus');
-    $ruleMethod = $this->input->post('ruleMethod');
-    $startDate = trim($this->input->post('startDate'));
-    $endDate = trim($this->input->post('endDate'));
+    $code = trim($this->input->post('code') ?? '');
+    $name = trim($this->input->post('name') ?? '');
+    $promotionStatus = $this->input->post('promotionStatus') ?? '';
+    $ruleStatus = $this->input->post('ruleStatus') ?? '';
+    $ruleMethod = $this->input->post('ruleMethod') ?? '';
+    $startDate = trim($this->input->post('startDate') ?? '');
+    $endDate = trim($this->input->post('endDate') ?? '');
 
     $items = $this->item_promotions_model->get_items_list($code, $name);
 
@@ -77,88 +80,101 @@ class Item_promotions extends PS_Controller
   {
     ini_set('memory_limit', '512M');
     ini_set('max_execution_time', 300); // 5 minutes
-   
-    $code = trim($this->input->post('code'));
-    $name = trim($this->input->post('name'));
-    $promotionStatus = $this->input->post('promotionStatus');
-    $ruleStatus = $this->input->post('ruleStatus');
-    $ruleMethod = $this->input->post('ruleMethod');
-    $startDate = trim($this->input->post('startDate'));
-    $endDate = trim($this->input->post('endDate'));
+
+    $code = trim($this->input->post('code') ?? '');
+    $name = trim($this->input->post('name') ?? '');
+    $promotionStatus = $this->input->post('promotionStatus') ?? '';
+    $ruleStatus = $this->input->post('ruleStatus') ?? '';
+    $ruleMethod = $this->input->post('ruleMethod') ?? '';
+    $startDate = trim($this->input->post('startDate') ?? '');
+    $endDate = trim($this->input->post('endDate') ?? '');
     $token = $this->input->post('token');
 
-    //---  Report title
     $report_title = "Report Items Promotions : (" . date('d/m/Y H:i') . ")";
-    //--- load excel library
-    $this->load->library('excel');
+    $header = [
+      '#',
+      'Item Code',
+      'Item Description',
+      'Rule Code',
+      'Rule Description',
+      'Rule Status',
+      'Rule Method',
+      'Promotion Code',
+      'Promotion Description',
+      'Promotion Status',
+      'Start Date',
+      'End Date'
+    ];
 
-    $this->excel->setActiveSheetIndex(0);
-    $this->excel->getActiveSheet()->setTitle('Item Promotions');
+    $tempFile = tempnam(sys_get_temp_dir(), 'item_promotions_');
+    $fileName = 'Report-Item-Promotions.xlsx';
 
-    //--- set report title header
-    $this->excel->getActiveSheet()->setCellValue('A1', $report_title);
-
-    //--- set Table header
-    $row = 2;
-
-    $this->excel->getActiveSheet()->setCellValue('A' . $row, '#');
-    $this->excel->getActiveSheet()->setCellValue('B' . $row, 'Item Code');
-    $this->excel->getActiveSheet()->setCellValue('C' . $row, 'Item Description');
-    $this->excel->getActiveSheet()->setCellValue('D' . $row, 'Rule Code');
-    $this->excel->getActiveSheet()->setCellValue('E' . $row, 'Rule Description');
-    $this->excel->getActiveSheet()->setCellValue('F' . $row, 'Rule Status');
-    $this->excel->getActiveSheet()->setCellValue('G' . $row, 'Rule Method');
-    $this->excel->getActiveSheet()->setCellValue('H' . $row, 'Promotion Code');
-    $this->excel->getActiveSheet()->setCellValue('I' . $row, 'Promotion Description');
-    $this->excel->getActiveSheet()->setCellValue('J' . $row, 'Promotion Status');
-    $this->excel->getActiveSheet()->setCellValue('K' . $row, 'Start Date');
-    $this->excel->getActiveSheet()->setCellValue('L' . $row, 'End Date');
-    $row++;
-
-    $items = $this->item_promotions_model->get_items_list($code, $name);
-
-    if (! empty($items))
+    try 
     {
-      $no = 1;
-      foreach ($items as $item)
-      {
-        $rules = $this->item_promotions_model->get_item_rules($item, $promotionStatus, $ruleStatus, $ruleMethod, $startDate, $endDate);
+      $writer = new Writer();
+      $writer->openToFile($tempFile);
+      $writer->addRow(Row::fromValues([$report_title]));      
+      $writer->addRow(Row::fromValues($header));
+      $sheet = $writer->getCurrentSheet();
+      $sheet->setColumnWidth(5, 1);
+      $sheet->setColumnWidth(15, 2);
+      $sheet->setColumnWidth(50, 3);
+      $sheet->setColumnWidthForRange(15, 4, 12);
 
-        if (!empty($rules))
+      $items = $this->item_promotions_model->get_items_list($code, $name);
+
+      if (! empty($items))
+      {
+        $no = 1;
+
+        foreach($items as $item)
         {
-          foreach ($rules as $rule)
+          $rules = $this->item_promotions_model->get_item_rules($item, $promotionStatus, $ruleStatus, $ruleMethod, $startDate, $endDate);
+
+          if (! empty($rules))
           {
-            $this->excel->getActiveSheet()->setCellValue('A' . $row, $no);
-            $this->excel->getActiveSheet()->setCellValue('B' . $row, $item->code);
-            $this->excel->getActiveSheet()->setCellValue('C' . $row, $item->name);
-            $this->excel->getActiveSheet()->setCellValue('D' . $row, $rule->rule_code);
-            $this->excel->getActiveSheet()->setCellValue('E' . $row, $rule->rule_name);
-            $this->excel->getActiveSheet()->setCellValue('F' . $row, $rule->rActive == '1' ? 'Active' : 'Inactive');
-            $this->excel->getActiveSheet()->setCellValue('G' . $row, $rule->type == 'F' ? 'Premium' : ($rule->type == 'N' ? 'Net Price' : 'Percentage'));
-            $this->excel->getActiveSheet()->setCellValue('H' . $row, $rule->promotion_code);
-            $this->excel->getActiveSheet()->setCellValue('I' . $row, $rule->promotion_name);
-            $this->excel->getActiveSheet()->setCellValue('J' . $row, $rule->pActive == '1' ? 'Active' : 'Inactive');
-            $this->excel->getActiveSheet()->setCellValue('K' . $row, thai_date($rule->start_date));
-            $this->excel->getActiveSheet()->setCellValue('L' . $row, thai_date($rule->end_date));
-            $row++;
-            $no++;
+            foreach($rules as $rs)
+            {
+              $writer->addRow(Row::fromValues([
+                $no,
+                $item->code,
+                $item->name,
+                $rs->rule_code,
+                $rs->rule_name,
+                $rs->rActive == '1' ? 'Active' : 'Inactive',
+                $rs->type == 'F' ? 'Premium': ($rs->type == 'N' ? 'Net Price' : 'Percentage'),
+                $rs->promotion_code,
+                $rs->promotion_name,
+                $rs->pActive == '1' ? 'Active' : 'Inactive',
+                thai_date($rs->start_date),
+                thai_date($rs->end_date)
+              ]));
+
+              $no++;
+            }
           }
         }
       }
+
+      $writer->close();
+
+      setToken($token);
+      while(ob_get_level()) ob_end_clean();
+      header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+      header('Content-Disposition: attachment; filename="' . $fileName . '"');
+      readfile($tempFile);      
     }
-    else
+    finally
     {
-      $this->excel->getActiveSheet()->setCellValue('A' . $row, "ไม่พบข้อมูลตามเงื่อนไขที่ระบุ");
+      if (file_exists($tempFile))
+      {
+        unlink($tempFile);
+      }
     }
 
-    setToken($token);
-    $file_name = "Report-Item-Promotions-" . date('dmY') . ".xlsx";
-    header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'); /// form excel 2007 XLSX
-    header('Content-Disposition: attachment;filename="' . $file_name . '"');
-    $writer = PHPExcel_IOFactory::createWriter($this->excel, 'Excel2007');
-    $writer->save('php://output');
+    exit;
   }
-
+ 
   public function get_item_code()
   {
     $ds = [];
@@ -222,6 +238,4 @@ class Item_promotions extends PS_Controller
 
     echo json_encode($ds);
   }
-
-
-} // class Item_promotions
+} 

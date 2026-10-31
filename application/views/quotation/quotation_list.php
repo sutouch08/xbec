@@ -140,6 +140,8 @@
 			<tbody>
 				<?php if (! empty($data)) : ?>
 					<?php $pageNo = get_zero($this->uri->segment($this->segment)); ?>
+					<?php $channels_arr = channels_array(); ?>
+					<?php $payment_arr = payments_array(); ?>					
 					<?php $no = $pageNo + 1; ?>
 					<?php foreach ($data as $rs) : ?>
 						<tr>
@@ -150,8 +152,8 @@
 							<td class="middle"><?php echo $rs->CardCode; ?></td>
 							<td class="middle"><?php echo $rs->CardName; ?></td>
 							<td class="middle text-right"><?php echo number($rs->DocTotal, 2); ?></td>
-							<td class="middle"><?php echo empty($channels[$rs->Channels]) ? "" : $channels[$rs->Channels]; ?></td>
-							<td class="middle"><?php echo empty($payments[$rs->Payment]) ? "" : $payments[$rs->Payment]; ?></td>
+							<td class="middle"><?php echo empty($channels_arr[$rs->Channels ?? '']) ? "" : $channels_arr[$rs->Channels]; ?></td>
+							<td class="middle"><?php echo empty($payment_arr[$rs->Payment ?? '']) ? "" : $payment_arr[$rs->Payment]; ?></td>
 							<td class="middle text-center">
 								<?php if ($rs->Status == -1) : ?>
 									<span class="purple">Draft</span>

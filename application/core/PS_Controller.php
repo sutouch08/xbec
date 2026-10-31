@@ -7,10 +7,9 @@ class PS_Controller extends CI_Controller
   public $home;
 	public $_user;
 	public $_SuperAdmin = FALSE;
-	public $_customer = FALSE;
-	public $ms;
-	public $mc;
+	public $_customer = FALSE;	
   public $error;
+	public $close_system;
 
   public function __construct()
   {
@@ -49,7 +48,7 @@ class PS_Controller extends CI_Controller
 		}
 
     //--- get permission for user
-    $this->pm = get_permission($this->menu_code, $uid, $this->_user->id_profile);
+    $this->pm = get_permission($this->menu_code, $uid);
 
 		if($this->pm->can_view == 0)
 		{
@@ -57,12 +56,10 @@ class PS_Controller extends CI_Controller
 		}
   }
 
-	public function is_expire_password($last_pass_change)
+	public function is_expire_password(?string $last_pass_change = '')
 	{
 		$today = date('Y-m-d');
-
 		$last_change = empty($last_pass_change) ? date('2021-01-01') : $last_pass_change;
-
 		$expire_days = intval(getConfig('USER_PASSWORD_AGE'));
 
 		if($expire_days != 0)

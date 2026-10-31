@@ -1,6 +1,8 @@
 <?php
 defined('BASEPATH') or exit('No direct script access allowed');
 
+use OpenSpout\Reader\XLSX\Reader;
+
 class Orders extends PS_Controller
 {
 	public $menu_code = 'SOODSO';
@@ -2359,8 +2361,7 @@ class Orders extends PS_Controller
 		$payment = $this->input->post('Payment');
 		$whsCode = getConfig('DEFAULT_WAREHOUSE');
 		$quotaNo = $this->_user->quota_no;
-
-		$this->load->library('excel');
+		
 		$file = isset($_FILES['uploadFile']) ? $_FILES['uploadFile'] : FALSE;
 		$ds = array(); //---- ไว้เก็บรายการสินค้า
 
@@ -2388,11 +2389,12 @@ class Orders extends PS_Controller
 			if ($sc === TRUE)
 			{
 				$info = $this->upload->data();
-				$excel = PHPExcel_IOFactory::load($info['full_path']);
-				$excel->setActiveSheetIndex(0);
+				$reader = new Reader();
+				$reader->open($info['full_path']);		
 
-				$sheet	= $excel->getSheet(0);
-
+				$sheet	= $reader->getSheetIterator()->current();
+				$rows = []; //--- เก็บข้อมูลแต่ละแถวจากไฟล์ Excel
+				
 				if (empty($sheet))
 				{
 					$sc = FALSE;
@@ -2401,44 +2403,54 @@ class Orders extends PS_Controller
 
 				if ($sc === TRUE)
 				{
-					$rows = $sheet->getHighestRow();
-					$i = 1;
-
-					while ($i <= $rows)
+					$totalRows = 0;
+					$isFirstRow = TRUE;
+					
+					foreach($sheet->getRowIterator() as $row)
 					{
-						if ($i > 1)
+						if($isFirstRow)
 						{
-							$code = $sheet->getCell("A{$i}")->getValue();
-							$qty = floatval(str_replace(',', '', $sheet->getCell("B{$i}")->getValue()));
+							$isFirstRow = FALSE;
+							continue;
+						}
 
-							if (! empty($code))
+						$totalRows++;
+						$cells = $row->getCells();
+						$rows[] = (object) array(
+							'code' => isset($cells[0]) ? $cells[0]->getValue() : NULL,
+							'qty' => isset($cells[1]) ? floatval(str_replace(',', '', $cells[1]->getValue())) : 0
+						);
+					}
+				}
+
+				if($sc === TRUE && $totalRows > 0)
+				{
+					foreach($rows as $item)
+					{
+						$code = $item->code;
+						$qty = $item->qty;
+
+						if(! empty($code))
+						{
+							$pd = $this->products_model->get($code);
+
+							if(!empty($pd))
 							{
-								$pd = $this->products_model->get($code);
+								$res = $this->getItemData($pd, $cardCode, $docDate, $payment, $channels, $whsCode, $quotaNo, $qty);
 
-								if (!empty($pd))
+								if ($res !== FALSE)
 								{
-									$res = $this->getItemData($pd, $cardCode, $docDate, $payment, $channels, $whsCode, $quotaNo, $qty);
-
-									if ($res !== FALSE)
-									{
-										$ds[] = $res;
-									}
-									else
-									{
-										$sc = FALSE;
-										$this->error = "Item {$code} : {$this->error}";
-										break;
-									}
+									$ds[] = $res;
+								}
+								else
+								{
+									$sc = FALSE;
+									$this->error = "Item {$code} : {$this->error}";
+									break;
 								}
 							}
-
-							$i++;
 						}
-						else
-						{
-							$i++;
-						}
-					}
+					}					
 				} //--- $sc
 			}
 		}

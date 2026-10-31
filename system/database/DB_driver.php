@@ -1354,7 +1354,7 @@ abstract class CI_DB_driver {
 			return $item;
 		}
 
-		static $preg_ec;
+		$preg_ec = []; // Previously static $preg_ec;
 
 		if (empty($preg_ec))
 		{

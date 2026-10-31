@@ -15,7 +15,7 @@
     <div class="col-lg-1-harf col-md-2 col-sm-2 col-xs-6 padding-5">
       <label>Customer</label>
       <input type="text" class="form-control input-sm search-box" name="customer" value="<?php echo $customer; ?>" />
-    </div>    
+    </div>
 
     <div class="col-lg-1-harf col-md-2 col-sm-2 col-xs-6 padding-5">
       <label>User</label>
@@ -32,11 +32,19 @@
         <?php echo select_channels($channels); ?>
       </select>
     </div>
-    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-6 padding-5">
+    <div class="col-lg-3 col-md-4 col-sm-4 col-xs-6 padding-5">
       <label>Projects</label>
       <select class="form-control input-sm" name="project" id="project">
         <option value="all">ทั้งหมด</option>
         <?php echo select_projects($project); ?>
+      </select>
+    </div>
+
+    <div class="col-lg-2 col-md-2-harf col-sm-2-harf col-xs-6 padding-5">
+      <label>Sale Employee</label>
+      <select class="form-control input-sm" name="sale_id" id="sale_id">
+        <option value="all">ทั้งหมด</option>
+        <?php echo select_sales_person($sale_id); ?>
       </select>
     </div>
 
@@ -56,13 +64,6 @@
         <option value="C" <?php echo is_selected($role, 'C'); ?>>Customer</option>
       </select>
     </div>
-    <div class="col-lg-2 col-md-2-harf col-sm-2-harf col-xs-6 padding-5">
-      <label>Sale Employee</label>
-      <select class="form-control input-sm" name="sale_id" id="sale_id">
-        <option value="all">ทั้งหมด</option>
-        <?php echo select_sales_person($sale_id); ?>
-      </select>
-    </div>
 
     <div class="col-lg-2 col-md-3 col-sm-3 col-xs-6 padding-5">
       <label>Document date</label>
@@ -70,17 +71,17 @@
         <input type="text" class="form-control input-sm width-50 text-center from-date" name="from_date" id="fromDate" value="<?php echo $from_date; ?>" />
         <input type="text" class="form-control input-sm width-50 text-center" name="to_date" id="toDate" value="<?php echo $to_date; ?>" />
       </div>
-    </div>    
+    </div>
 
-    <div class="col-lg-1 col-md-1 col-sm-1 col-xs-6 padding-5">
+    <div class="col-lg-1 col-md-1 col-sm-1 col-xs-3 padding-5">
       <label class="display-block not-show">buton</label>
       <button type="button" class="btn btn-xs btn-primary btn-block" onclick="getSearch()">Search</button>
     </div>
-    <div class="col-lg-1 col-md-1 col-sm-1 col-xs-6 padding-5">
+    <div class="col-lg-1 col-md-1 col-sm-1 col-xs-3 padding-5">
       <label class="display-block not-show">buton</label>
       <button type="button" class="btn btn-xs btn-warning btn-block" onclick="clearFilter()">Reset</button>
     </div>
-  </div>  
+  </div>
   <input type="hidden" name="search" value="1" />
 </form>
 <hr />
@@ -94,8 +95,8 @@
           <th class="fix-width-30 middle"></th>
           <th class="fix-width-40 middle text-center">#</th>
           <th class="fix-width-80 middle text-center">Doc. date</th>
-          <th class="fix-width-100 middle">Web No.</th>          
-          <th class="min-width-300 middle">Customer</th>          
+          <th class="fix-width-100 middle">Web No.</th>
+          <th class="min-width-300 middle">Customer</th>
           <th class="fix-width-100 middle text-right">Amount</th>
           <th class="fix-width-80 middle text-center">Payment</th>
           <th class="fix-width-100 middle">Channels</th>
@@ -116,12 +117,12 @@
           <?php foreach ($data as $rs) : ?>
             <tr id="row-<?php echo $rs->id; ?>">
               <td class="middle">
-                <button type="button" class="btn btn-minier btn-info" onclick="viewDetail('<?php echo $rs->code; ?>', '<?php echo $pageNo; ?>')"><i class="fa fa-eye"></i></button>                
+                <button type="button" class="btn btn-minier btn-info" onclick="viewDetail('<?php echo $rs->code; ?>', '<?php echo $pageNo; ?>')"><i class="fa fa-eye"></i></button>
               </td>
               <td class="middle text-center no"><?php echo $no; ?></td>
               <td class="middle text-center"><?php echo thai_date($rs->DocDate, FALSE, '.'); ?></td>
-              <td class="middle"><?php echo $rs->code; ?></td>              
-              <td class="middle"><?php echo $rs->CardCode.'&nbsp;&nbsp;:&nbsp;&nbsp;'.$rs->CardName; ?></td>
+              <td class="middle"><?php echo $rs->code; ?></td>
+              <td class="middle"><?php echo $rs->CardCode . '&nbsp;&nbsp;:&nbsp;&nbsp;' . $rs->CardName; ?></td>
               <td class="middle text-right"><?php echo number($rs->DocTotal, 2); ?></td>
               <td class="middle text-center"><?php echo isset($payments[$rs->Payment]) ? $payments[$rs->Payment] : ''; ?></td>
               <td class="middle"><?php echo isset($channels[$rs->Channels]) ? $channels[$rs->Channels] : ''; ?></td>

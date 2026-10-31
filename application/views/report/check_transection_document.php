@@ -1,55 +1,53 @@
 <?php $this->load->view('include/header'); ?>
-<div class="row hidden-print">
-	<div class="col-sm-8 padding-5">
-    <h3 class="title"><?php echo $this->title; ?></h3>
-    </div>
-		<div class="col-sm-4 padding-5">
-			<p class="pull-right top-p">
-				<button type="button" class="btn btn-sm btn-success" onclick="getReport()"><i class="fa fa-bar-chart"></i> รายงาน</button>
-				<button type="button" class="btn btn-sm btn-primary" onclick="doExport()"><i class="fa fa-file-excel-o"></i> ส่งออก</button>
-			</p>
-		</div>
+<div class="row">
+	<div class="col-lg-8 col-md-8 col-sm-8 col-xs-12 padding-5 padding-top-5">
+		<h3 class="title"><?php echo $this->title; ?></h3>
+	</div>
+	<div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 padding-5 text-right">
+		<button type="button" class="btn btn-white btn-success top-btn" onclick="getReport()"><i class="fa fa-bar-chart"></i>&nbsp;  รายงาน</button>
+		<button type="button" class="btn btn-white btn-primary top-btn" onclick="doExport()"><i class="fa fa-file-excel-o"></i>&nbsp; ส่งออก</button>
+	</div>
 </div><!-- End Row -->
-<hr class="hidden-print"/>
+<hr class="hidden-print" />
 <form class="hidden-print" id="reportForm" method="post" action="<?php echo $this->home; ?>/do_export">
-  <div class="row">
-    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-6 padding-5">
-      <label>Web No.</label>
-      <input type="text" class="width-100 search-box" name="code" id="web-code" value="" />
-    </div>
+	<div class="row">
+		<div class="col-lg-2 col-md-2 col-sm-2 col-xs-6 padding-5">
+			<label>Web No.</label>
+			<input type="text" class="form-control input-sm search-box" name="code" id="web-code" value="" />
+		</div>
 
-  	<div class="col-lg-2 col-md-2 col-sm-2 col-xs-6 padding-5">
-  		<label>Customer Code</label>
-  		<input type="text" class="width-100 search-box" name="customer" id="customer" value="" />
-  	</div>
+		<div class="col-lg-2 col-md-2 col-sm-2 col-xs-6 padding-5">
+			<label>Customer Code</label>
+			<input type="text" class="form-control input-sm search-box" name="customer" id="customer" value="" />
+		</div>
 
-  	<div class="col-lg-2 col-md-2 col-sm-2 col-xs-6 padding-5">
-  		<label>SO No.</label>
-      <input type="text" class="width-100 search-box" name="soCode" id="so-code"  value="" />
-  	</div>
-  	<div class="col-lg-2 col-md-2-harf col-sm-2-harf col-xs-6 padding-5">
-      <label>Sale Employee</label>
-  		<select class="width-100 filter" name="sale_id" id="sale_id">
-  			<option value="all">ทั้งหมด</option>
-  			<?php echo select_sale(); ?>
-  		</select>
-    </div>
+		<div class="col-lg-2 col-md-2 col-sm-2 col-xs-6 padding-5">
+			<label>SO No.</label>
+			<input type="text" class="form-control input-sm search-box" name="soCode" id="so-code" value="" />
+		</div>
+		<div class="col-lg-2 col-md-2-harf col-sm-2-harf col-xs-6 padding-5">
+			<label>Sale Employee</label>
+			<select class="form-control input-sm filter" name="sale_id" id="sale_id">
+				<option value="all">ทั้งหมด</option>
+				<?php echo select_sale(); ?>
+			</select>
+		</div>
 
-  	<div class="col-lg-2 col-md-3 col-sm-3 col-xs-6 padding-5">
-  		<label>INV Date</label>
-  		<div class="input-daterange input-group width-100">
-  			<input type="text" class="form-control input-sm width-50 text-center from-date" name="from_date" id="fromDate" value="<?php echo date('01-m-Y'); ?>" />
-  			<input type="text" class="form-control input-sm width-50 text-center" name="to_date" id="toDate" value="<?php echo date('t-m-Y'); ?>" />
-  		</div>
-  	</div>
-  </div>
-  <input type="hidden" name="token" id="token" />
+		<div class="col-lg-2 col-md-3 col-sm-3 col-xs-6 padding-5">
+			<label>INV Date</label>
+			<div class="input-daterange input-group width-100">
+				<input type="text" class="form-control input-sm width-50 text-center from-date" name="from_date" id="fromDate" value="<?php echo date('01-m-Y'); ?>" />
+				<input type="text" class="form-control input-sm width-50 text-center" name="to_date" id="toDate" value="<?php echo date('t-m-Y'); ?>" />
+			</div>
+		</div>
+	</div>
+	<input type="hidden" name="token" id="token" />
 </form>
 
 <hr class="margin-top-15 margin-bottom-15">
 
 <div class="row">
-  <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 padding-5 table-responsive" id="result-window" style="overflow:auto;">
+	<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 padding-5 table-responsive" id="result-window" style="overflow:auto;">
 		<table class="table table-bordered tableFixHead" style="min-width:1300px;">
 			<thead>
 				<tr class="font-size-11">
@@ -72,22 +70,22 @@
 
 			</tbody>
 		</table>
-  </div>
+	</div>
 </div>
 
 <script id="template" type="text/x-handlebarsTemplate">
 	{{#each this}}
-    {{#if nodata}}
-      <tr class="font-size-10">
-        <td colspan="13" class="middle text-center font-size-24">--- NO DATA FOUND ---</td>
-      </tr>
-    {{else}}
-      <tr class="font-size-10">
-        <td class="middle text-center">{{no}}</td>
+		{{#if nodata}}
+			<tr class="font-size-10">
+				<td colspan="13" class="middle text-center font-size-24">--- NO DATA FOUND ---</td>
+			</tr>
+		{{else}}
+			<tr class="font-size-10">
+				<td class="middle text-center">{{no}}</td>
 				<td class="middle">{{customerCode}}</td>
 				<td class="middle">{{customerName}}</td>
 				<td class="middle">{{saleEmployee}}</td>
-        <td class="middle">{{U_WEBORDER}}</td>
+				<td class="middle">{{U_WEBORDER}}</td>
 				<td class="middle text-center">{{ivPrefix}}</td>
 				<td class="middle text-center">{{ivCode}}</td>
 				<td class="middle text-center">{{ivDate}}</td>
@@ -97,22 +95,22 @@
 				<td class="middle">{{soPrefix}} {{soCode}}</td>
 				<td class="middle">{{doPrefix}} {{doCode}}</td>
 			</tr>
-    {{/if}}
+		{{/if}}
 	{{/each}}
 </script>
 
 <script>
-  $('#sale_id').select2();
+	$('#sale_id').select2();
 	$('#fromDate').datepicker({
-		dateFormat:'dd-mm-yy',
-		onClose:function(sd) {
+		dateFormat: 'dd-mm-yy',
+		onClose: function(sd) {
 			$('#toDate').datepicker('option', 'minDate', sd);
 		}
 	})
 
 	$('#toDate').datepicker({
-		dateFormat:'dd-mm-yy',
-		onClose:function(sd) {
+		dateFormat: 'dd-mm-yy',
+		onClose: function(sd) {
 			$('#fromDate').datepicker('option', 'maxDate', sd);
 		}
 	})

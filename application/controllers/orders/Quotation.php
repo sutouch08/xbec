@@ -1,4 +1,6 @@
 <?php
+use OpenSpout\Reader\XLSX\Reader;
+
 class Quotation extends PS_Controller
 {
 	public $menu_code = 'SOODSQ';
@@ -64,9 +66,7 @@ class Quotation extends PS_Controller
 			$perpage = get_rows();
 			$rows = $this->quotation_model->count_rows($filter);
 	    $filter['data'] = $this->quotation_model->get_list($filter, $perpage, $this->uri->segment($this->segment));			
-			$init	= pagination_config($this->home.'/index/', $rows, $perpage, $this->segment);
-			$filter['channels'] = channels_array();
-			$filter['payments'] = payments_array();
+			$init	= pagination_config($this->home.'/index/', $rows, $perpage, $this->segment);			
 			$this->pagination->initialize($init);
 	    $this->load->view('quotation/quotation_list', $filter);
 		}
@@ -686,7 +686,6 @@ class Quotation extends PS_Controller
 		}
 	}
 
-
 	public function parseDimCode($d1, $d2, $d3, $d4, $d5)
 	{
 		$name = "";
@@ -699,7 +698,6 @@ class Quotation extends PS_Controller
 
 		return $name;
 	}
-
 
 	public function duplicate_quotation()
 	{
@@ -1213,20 +1211,13 @@ class Quotation extends PS_Controller
 	public function get_discount_data()
 	{
 		$sc = TRUE;
-		$itemCode = $this->input->get('ItemCode');
-		$cardCode = $this->input->get('CardCode');
-		$docDate = db_date($this->input->get('DocDate'));
-		$payment = $this->input->get('Payment');
-		$channels = $this->input->get('Channels');
+		$itemCode = $this->input->get('ItemCode');		
 		$qty = $this->input->get('Qty');
 		$price = $this->input->get('Price');
-
 		$pd = $this->products_model->get($itemCode);
 
 		if(! empty($pd))
-		{
-			//$disc = $this->discount_model->get_item_discount($itemCode, $cardCode, $price, $qty, $payment, $channels, $docDate);
-
+		{			
 			$ds = array(
 				'ItemCode' => $pd->code,
 				'ItemName' => $pd->name,
@@ -1235,24 +1226,23 @@ class Quotation extends PS_Controller
 				'UomName' => $pd->uom,
 				'StdPrice' => $price,
 				'Price' => $price,
-				'SellPrice' => $price, //$disc->sellPrice,
-				'sysSellPrice' => $price, //$disc->sellPrice,
-				'sysDiscLabel' => 0, //discountLabel($disc->disc1, $disc->disc2, $disc->disc3, $disc->disc4, $disc->disc5),
-				'discLabel' => 0, //discountLabel($disc->disc1, $disc->disc2, $disc->disc3, $disc->disc4, $disc->disc5),
-				'DiscPrcnt' => 0, //$disc->totalDiscPrecent,
-				'discAmount' => 0, //$disc->discAmount,
-				'totalDiscAmount' => 0, //$disc->totalDiscAmount,
+				'SellPrice' => $price,
+				'sysSellPrice' => $price,
+				'sysDiscLabel' => 0,
+				'discLabel' => 0,
+				'DiscPrcnt' => 0,
+				'discAmount' => 0,
+				'totalDiscAmount' => 0,
 				'VatGroup' => $pd->vat_group,
 				'VatRate' => $pd->vat_rate,
-				'VatAmount' => get_vat_amount($price, $pd->vat_rate), //($disc->sellPrice, $pd->vat_rate),
-				'TotalVatAmount' => get_vat_amount($price, $pd->vat_rate) * $qty, //(get_vat_amount($disc->sellPrice, $pd->vat_rate) * $qty),
-				'LineTotal' => $price * $qty, //($disc->sellPrice * $qty),
-				'rule_id' => 0, //$disc->rule_id,
-				'policy_id' => NULL, //$disc->policy_id,
-				'freeQty' => 0, //$disc->freeQty,
-				'discType' => 'P', //$disc->type
+				'VatAmount' => get_vat_amount($price, $pd->vat_rate),
+				'TotalVatAmount' => get_vat_amount($price, $pd->vat_rate) * $qty, 
+				'LineTotal' => $price * $qty, 
+				'rule_id' => 0,
+				'policy_id' => NULL,
+				'freeQty' => 0, 
+				'discType' => 'P',
 			);
-
 		}
 		else
 		{
@@ -1263,18 +1253,14 @@ class Quotation extends PS_Controller
 		echo $sc === TRUE ? json_encode($ds) : $this->error;
 	}
 
-
 	public function get_free_item()
 	{
 		$rule_id = $this->input->get('rule_id');
 		$uid = $this->input->get('uid');
 		$freeQty = $this->input->get('freeQty');
-		$picked = $this->input->get('picked');
-		$priceList = $this->input->get('priceList');
+		$picked = $this->input->get('picked');		
 		$qty = $freeQty - $picked;
-
 		$list = $this->discount_model->get_free_item_list($rule_id);
-
 		$ds = "";
 
 		if(!empty($list))
@@ -1293,7 +1279,7 @@ class Quotation extends PS_Controller
 				$uuid = uniqid(rand(1,100));
 				$img = get_image_path($rs->product_id, 'mini');
 				$pd = $this->products_model->get($rs->product_code);
-				$price = $pd->price; //$this->getPrice($pd->code, $priceList);
+				$price = $pd->price;
 
 				$ds .= "<tr>";
 				$ds .= "<td class='text-center'><img src='{$img}' width='40' height='40' /></td>";
@@ -1325,23 +1311,18 @@ class Quotation extends PS_Controller
 		echo $ds;
 	}
 
-
 	public function getPrice($ItemCode, $priceList)
 	{
 		$this->load->library('api');
 		return $this->api->getItemPrice($ItemCode, $priceList);
 	}
 
-
 	public function get_item_price()
 	{
 		$ItemCode = $this->input->get('itemCode');
 		$priceList = $this->input->get('priceList');
-
 		return $this->getPrice($ItemCode, $priceList);
-
 	}
-
 
 	public function getStock($ItemCode, $WhsCode, $QuotaNo)
 	{
@@ -1374,25 +1355,18 @@ class Quotation extends PS_Controller
     return $arr;
 	}
 
-
-
 	public function get_stock()
 	{
 		$ItemCode = $this->input->get('itemCode');
 		$whsCode = $this->input->get('whsCode');
 		$quota = $this->input->get('quota');
-
 		$arr = $this->getStock($ItemCode, $whsCode, $quota);
-
 		echo json_encode($arr);
 	}
-
-
 
 	public function remove_row()
 	{
 		$sc = TRUE;
-
 		$id = $this->input->post('id');
 		$code = $this->input->post('order_code');
 
@@ -1409,12 +1383,10 @@ class Quotation extends PS_Controller
 		$this->_response($sc);
 	}
 
-
 	public function export_order($code)
 	{
 		return TRUE;
 	}
-
 
 	public function get_customer_order_data()
 	{
@@ -1473,8 +1445,6 @@ class Quotation extends PS_Controller
 		}
 	}
 
-
-
 	public function get_address_ship_to()
 	{
 		$CardCode = $this->input->get('CardCode');
@@ -1500,7 +1470,6 @@ class Quotation extends PS_Controller
 			echo "not found";
 		}
 	}
-
 
 	public function get_address_bill_to()
 	{
@@ -1530,12 +1499,9 @@ class Quotation extends PS_Controller
 		}
 	}
 
-
-
 	public function get_order_message()
 	{
 		$code = $this->input->get('code');
-
 		$order = $this->quotation_model->get($code);
 
 		if(!empty($order))
@@ -1631,11 +1597,9 @@ class Quotation extends PS_Controller
 	{
 		$sc = TRUE;		
 		$whsCode = getConfig('DEFAULT_WAREHOUSE');
-		$quotaNo = $this->_user->quota_no;
-
-		$this->load->library('excel');
+		$quotaNo = $this->_user->quota_no;		
 		$file = isset($_FILES['uploadFile']) ? $_FILES['uploadFile'] : FALSE;
-		$ds = array(); //---- ไว้เก็บรายการสินค้า
+		$ds = []; //---- ไว้เก็บรายการสินค้า
 
 		if ($file !== FALSE)
 		{
@@ -1661,10 +1625,9 @@ class Quotation extends PS_Controller
 			if ($sc === TRUE)
 			{
 				$info = $this->upload->data();
-				$excel = PHPExcel_IOFactory::load($info['full_path']);
-				$excel->setActiveSheetIndex(0);
-
-				$sheet	= $excel->getSheet(0);
+				$reader = new Reader();
+				$reader->open($info['full_path']);
+				$sheet	= $reader->getSheetIterator()->current();
 
 				if (empty($sheet))
 				{
@@ -1674,19 +1637,26 @@ class Quotation extends PS_Controller
 
 				if ($sc === TRUE)
 				{
-					$rows = $sheet->getHighestRow();
-					$i = 1;
+					$isFirstRow = TRUE;
 					
-					while ($i <= $rows)
+					foreach($sheet->getRowIterator() as $row)
 					{
-						if ($i > 1)
+						if($isFirstRow)
 						{
-							$code = $sheet->getCell("A{$i}")->getValue();
-							$qty = floatval(str_replace(',', '', $sheet->getCell("B{$i}")->getValue()));
-							$price = floatval(str_replace(',', '', $sheet->getCell("C{$i}")->getValue()));
-							$discLabel = $sheet->getCell("D{$i}")->getValue();
+							$isFirstRow = FALSE;
+							continue;
+						}
 
-							if (! empty($code))
+						$cells = $row->getCells();
+
+						if($cells)
+						{
+							$code = $cells[0]->getValue();
+							$qty = floatval(str_replace(',', '', $cells[1]->getValue()));
+							$price = floatval(str_replace(',', '', $cells[2]->getValue()));
+							$discLabel = $cells[3]->getValue();
+
+							if( ! empty($code))
 							{
 								$pd = $this->products_model->get($code);
 
@@ -1706,14 +1676,8 @@ class Quotation extends PS_Controller
 									}
 								}
 							}
-
-							$i++;
 						}
-						else
-						{
-							$i++;
-						}
-					}
+					}									
 				} //--- $sc
 			}
 		}
@@ -1731,7 +1695,6 @@ class Quotation extends PS_Controller
 
 		echo json_encode($arr);
 	}
-
 
 	public function clear_filter()
 	{
@@ -1757,8 +1720,6 @@ class Quotation extends PS_Controller
 		return clear_filter($filter);
 	}
 
-
-
 	public function get_new_code($date = NULL)
   {
     $date = empty($date) ? date('Y-m-d') : $date;
@@ -1781,8 +1742,4 @@ class Quotation extends PS_Controller
 
     return $new_code;
   }
-
-}//--- end class
-
-
- ?>
+}

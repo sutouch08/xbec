@@ -59,7 +59,7 @@ class Discount_policy extends PS_Controller
   {
 		$sc = TRUE;
     $id = NULL;
-    $ds = json_decode($this->input->post('data'));
+    $ds = json_decode($this->input->post('data') ?? '{}');
 
     if(! $this->pm->can_add)
     {
@@ -110,7 +110,6 @@ class Discount_policy extends PS_Controller
     $data['policy'] = $rs;
     $data['rules']  = $this->discount_rule_model->get_policy_rules($rs->id);
     $data['can_approve'] = $this->_SuperAdmin ? TRUE : $this->approver_model->is_promotion_approver($this->_user->id);
-
     $this->load->view('discount/policy/policy_edit', $data);
   }
 
@@ -142,7 +141,7 @@ class Discount_policy extends PS_Controller
   public function add_rules()
   {
     $sc = TRUE;
-    $ds = json_decode($this->input->post('data'));
+    $ds = json_decode($this->input->post('data') ?? '{}');
 
     if(! $this->pm->can_add && ! $this->pm->can_edit)
     {
@@ -207,7 +206,7 @@ class Discount_policy extends PS_Controller
   public function remove_rules()
   {
     $sc = TRUE;
-    $ds = json_decode($this->input->post('data'));
+    $ds = json_decode($this->input->post('data') ?? '{}');
 
     if(! $this->pm->can_add && ! $this->pm->can_edit)
     {
@@ -344,8 +343,7 @@ class Discount_policy extends PS_Controller
     $this->load->helper('discount_rule');
     $rs = $this->discount_policy_model->get($id);
     $data['policy'] = $rs;
-    $data['rules']  = $this->discount_rule_model->get_policy_rules($rs->id);    
-
+    $data['rules']  = $this->discount_rule_model->get_policy_rules($rs->id);
     $this->load->view('discount/policy/policy_view_detail', $data);
   }
 

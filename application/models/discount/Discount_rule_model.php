@@ -289,7 +289,6 @@ class Discount_rule_model extends CI_Model
 		return NULL;
 	}
 
-
 	public function getProductItemRule($id)
 	{
 		$rs = $this->db
@@ -324,7 +323,6 @@ class Discount_rule_model extends CI_Model
 		return NULL;
 	}
 
-
 	public function getProductTypeRule($id)
 	{
 		$rs = $this->db
@@ -341,7 +339,6 @@ class Discount_rule_model extends CI_Model
 
 		return NULL;
 	}
-
 
 	public function getProductCategoryRule($id)
 	{
@@ -360,7 +357,6 @@ class Discount_rule_model extends CI_Model
 		return NULL;
 	}
 
-
 	public function getProductBrandRule($id)
 	{
 		$rs = $this->db
@@ -378,8 +374,6 @@ class Discount_rule_model extends CI_Model
 		return NULL;
 	}
 
-
-
 	public function getChannelsRule($id)
 	{
 		$rs = $this->db
@@ -396,7 +390,6 @@ class Discount_rule_model extends CI_Model
 
 		return NULL;
 	}
-
 
 	public function getPaymentRule($id)
 	{
@@ -871,6 +864,7 @@ class Discount_rule_model extends CI_Model
 	{
 		return $this->db->where('rule_id', $rule_id)->delete('discount_rule_product_brand');
 	}
+	
 	public function drop_rule_exclude_product($rule_id)
 	{
 		return $this->db->where('rule_id', $rule_id)->delete('discount_rule_product_exclude');

@@ -35,9 +35,8 @@ class Discount_policy_model extends CI_Model
 	
   public function get($id)
   {
-    $rs = $this->db
-		->where('id', $id)
-		->get($this->tb);
+    $rs = $this->db->where('id', $id)->get($this->tb);
+
     if($rs->num_rows() == 1)
     {
       return $rs->row();

@@ -1,3 +1,14 @@
+*.png
+*.jpg
+*.gif
+*.ico
+*.mp3
+*.pdf
+*.xls
+*.xlsx
+*.csv
+*.mp4
+*.webm
 index.php
 /.htaccess
 /application/config/config.php
