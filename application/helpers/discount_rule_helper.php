@@ -90,7 +90,7 @@ function selectMultipleBrands(array $selected = array())
 	{
 		foreach ($option as $rs)
 		{
-			$se = in_array($rs->code, $selected) ? 'selected' : '';
+			$se = in_array($rs->id, $selected) ? 'selected' : '';
 			$ds .= "<option data-id=\"{$rs->id}\" data-code=\"{$rs->code}\" data-name=\"{$rs->name}\" value=\"{$rs->id}\" {$se}>{$rs->name}</option>";
 		}
 	}
@@ -109,7 +109,7 @@ function selectMultipleCategory(array $selected = array())
 	{
 		foreach ($option as $rs)
 		{
-			$se = in_array($rs->code, $selected) ? 'selected' : '';
+			$se = in_array($rs->id, $selected) ? 'selected' : '';
 			$ds .= "<option data-id=\"{$rs->id}\" data-code=\"{$rs->code}\" data-name=\"{$rs->name}\" value=\"{$rs->id}\" {$se}>{$rs->name}</option>";
 		}
 	}

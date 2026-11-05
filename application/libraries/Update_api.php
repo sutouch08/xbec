@@ -46,7 +46,7 @@ class Update_api
 			{
 				$response = curl_error($curl);
 			}
-			curl_close($curl);
+			
 			$req_end = now(TRUE);
 			$rs = json_decode($response);
 
@@ -127,7 +127,7 @@ class Update_api
 			{
 				$response = curl_error($curl);
 			}
-			curl_close($curl);
+			
 			$req_end = now(TRUE);
 			$rs = json_decode($response);
 
@@ -207,7 +207,7 @@ class Update_api
 			{
 				$response = curl_error($curl);
 			}
-			curl_close($curl);
+			
 			$req_end = now(TRUE);
 			$rs = json_decode($response);
 
@@ -286,7 +286,7 @@ class Update_api
 			{
 				$response = curl_error($curl);
 			}
-			curl_close($curl);
+			
 			$req_end = now(TRUE);
 			$rs = json_decode($response);
 
@@ -366,7 +366,7 @@ class Update_api
 			{
 				$response = curl_error($curl);
 			}
-			curl_close($curl);
+			
 			$req_end = now(TRUE);
 			$rs = json_decode($response);
 
@@ -446,7 +446,7 @@ class Update_api
 			{
 				$response = curl_error($curl);
 			}
-			curl_close($curl);
+			
 			$req_end = now(TRUE);
 			$rs = json_decode($response);
 
@@ -527,7 +527,7 @@ class Update_api
 			{
 				$response = curl_error($curl);
 			}
-			curl_close($curl);
+			
 			$req_end = now(TRUE);
 			$rs = json_decode($response);
 
@@ -608,7 +608,7 @@ class Update_api
 			{
 				$response = curl_error($curl);
 			}
-			curl_close($curl);
+			
 			$req_end = now(TRUE);
 			$rs = json_decode($response);
 
@@ -689,7 +689,7 @@ class Update_api
 			{
 				$response = curl_error($curl);
 			}
-			curl_close($curl);
+			
 			$req_end = now(TRUE);
 			$rs = json_decode($response);
 
@@ -770,7 +770,7 @@ class Update_api
 			{
 				$response = curl_error($curl);
 			}
-			curl_close($curl);
+			
 			$req_end = now(TRUE);
 			$rs = json_decode($response);
 
@@ -851,7 +851,7 @@ class Update_api
 			{
 				$response = curl_error($curl);
 			}
-			curl_close($curl);
+			
 			$req_end = now(TRUE);
 			$rs = json_decode($response);
 

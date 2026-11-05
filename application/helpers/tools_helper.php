@@ -159,12 +159,12 @@ function parseInt($number)
 
 function number($val, $digit = 0)
 {
-	return number_format($val, $digit);
+	return number_format($val ?? 0, $digit);
 }
 
 function ac_format($val, $digit = 0)
 {
-	return $val == 0 ? '-' : number_format($val, $digit);
+	return ($val == 0 || $val === NULL) ? '-' : number_format($val, $digit);
 }
 
 function getConfig($code)

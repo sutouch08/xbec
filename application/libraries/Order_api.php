@@ -38,9 +38,7 @@ class Order_api
 		if($response === FALSE)
 		{
 			$response = curl_error($curl);
-		}
-
-		curl_close($curl);
+		}		
 
 		$rs = json_decode($response);			
 
@@ -83,7 +81,7 @@ class Order_api
 			{
 				$response = curl_error($curl);
 			}
-			curl_close($curl);
+			
 			$req_end = now(TRUE);
 			$rs = json_decode($response);
 
@@ -244,7 +242,7 @@ class Order_api
 				{
 					$response = curl_error($curl);
 				}
-				curl_close($curl);
+				
 				$req_end = now(TRUE);
 				$rs = json_decode($response);
 
@@ -369,7 +367,7 @@ class Order_api
 		{
 			$response = curl_error($curl);
 		}
-		curl_close($curl);
+		
 		$req_end = now(TRUE);
 		$rs = json_decode($response);
 		if (! empty($rs) && ! empty($rs->status))
@@ -454,9 +452,7 @@ class Order_api
 		curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, FALSE);
 		curl_setopt($curl, CURLOPT_HTTPHEADER, array("Content-Type: application/json"));
 
-		$response = curl_exec($curl);
-
-		curl_close($curl);
+		$response = curl_exec($curl);		
 
 		$res = json_decode($response);
 
@@ -674,7 +670,7 @@ class Order_api
 				{
 					$response = curl_error($curl);
 				}
-				curl_close($curl);
+				
 				$req_end = now(TRUE);
 				$rs = json_decode($response);
 

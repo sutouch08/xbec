@@ -74,7 +74,7 @@
               </td>
               <td class="middle"><?php echo $rs->name; ?></td>
               <td class="middle text-center"><?php echo ($rs->type == 'N' ? 'Net Price' : ($rs->type == 'P' ? 'Percentage' : 'Premium')); ?></td>
-              <td class="middle text-center"><?php echo discount_label($rs->type, $rs->price, $rs->disc1, $rs->disc2, $rs->disc3, $rs->disc4, $rs->disc5); ?></td>
+              <td class="middle text-center"><?php echo $rs->type == 'P' ? discount_label($rs->type, $rs->price, $rs->disc1, $rs->disc2, $rs->disc3, $rs->disc4, $rs->disc5) : '-'; ?></td>
               <td class="middle text-center"><?php echo $rs->freeQty; ?></td>
               <td class="middle text-center"><?php echo ($rs->all_customer == 1 ? 'ทั้งหมด' : 'กำหนดค่า'); ?></td>
               <td class="middle text-center"><?php echo ($rs->all_product == 1 ? 'ทั้งหมด' : 'กำหนดค่า'); ?></td>
