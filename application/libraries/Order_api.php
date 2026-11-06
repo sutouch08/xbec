@@ -8,6 +8,7 @@ class Order_api
 	public $logJson = FALSE;
   private $timeout = 10; //--- timeout in seconds;
 	private $type = "SO";
+	private $action = "create";
 
   public function __construct()
   {
