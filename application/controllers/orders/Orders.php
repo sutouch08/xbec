@@ -281,6 +281,7 @@ class Orders extends PS_Controller
 								{
 									$disc = parse_discount_text($rs->discLabel, $rs->Price);
 									$sysdisc = parse_discount_text($rs->sysDiscLabel, $rs->Price);
+									$cost = round($this->products_model->get_sap_item_avg_cost($rs->ItemCode), 2);
 
 									$arr = array(
 										'order_code' => $code,
@@ -291,8 +292,8 @@ class Orders extends PS_Controller
 										'OpenQty' => $rs->Quantity,
 										'UomCode' => $pd->uom_code,
 										'UomEntry' => $pd->uom_id,
-										'Cost' => $rs->Cost,
-										'totalCost' => $rs->totalCost,
+										'Cost' => $cost,
+										'totalCost' => $cost * $rs->Quantity,
 										'StdPrice' => $rs->StdPrice,
 										'Price' => $rs->Price,
 										'SellPrice' => $rs->SellPrice,
@@ -610,6 +611,7 @@ class Orders extends PS_Controller
 													{
 														$disc = parse_discount_text($rs->discLabel, $rs->Price);
 														$sysdisc = parse_discount_text($rs->sysDiscLabel, $rs->Price);
+														$cost = round($this->products_model->get_sap_item_avg_cost($rs->ItemCode), 2);
 
 														$arr = array(
 															'order_code' => $code,
@@ -620,8 +622,8 @@ class Orders extends PS_Controller
 															'OpenQty' => $rs->Quantity,
 															'UomCode' => $pd->uom_code,
 															'UomEntry' => $pd->uom_id,
-															'Cost' => $rs->Cost,
-															'totalCost' => $rs->totalCost,
+															'Cost' => $cost,
+															'totalCost' => $cost * $rs->Quantity,
 															'StdPrice' => $rs->StdPrice,
 															'Price' => $rs->Price,
 															'SellPrice' => $rs->SellPrice,
@@ -878,7 +880,35 @@ class Orders extends PS_Controller
 					{
 						if ($this->_SuperAdmin or $can_approve === TRUE)
 						{
+							$totalGp = 0;
+							$rowCount = 0;
+							$totalCost = 0;
+
+							if( ! empty($details))
+							{
+								foreach($details as $rs)
+								{
+									$gp = 0;
+									$cost = round($this->products_model->get_sap_item_avg_cost($rs->ItemCode) ?? 0, 2);									
+									$margin = $rs->SellPrice - $cost;
+									if($cost > 0 && $margin > 0 && $rs->SellPrice > 0) $gp = round(($margin / $rs->SellPrice) * 100, 2);
+									if($cost > 0 && $margin < 0) $gp = round(($margin / $cost) * 100, 2);
+									$totalGp += $gp;
+									$totalCost += round($cost * $rs->Qty, 2);
+									$rowCount++;
+
+									$arr = array(
+										'Cost' => $cost,
+										'totalCost' => round($cost * $rs->Qty, 2)
+									);
+
+									$this->orders_model->update_detail($rs->id, $arr);
+								}
+							}
+
 							$arr = array(
+								'totalCost' => $totalCost,
+								'totalGp' => $rowCount > 0 ? round($totalGp / $rowCount, 2) : 0,
 								'Approved' => 'A',
 								'Approver' => $this->_user->uname
 							);
@@ -1014,7 +1044,10 @@ class Orders extends PS_Controller
 		$this->load->model('masters/cost_center_model');
 		$this->load->model('discount/discount_policy_model');
 
+		$rowsCount = 0;
+		$totalGp = 0;
 		$totalAmount = 0;
+		$totalCost = 0;
 		$approver_id = NULL;
 		$visible_gp = FALSE;
 		$brand = NULL;
@@ -1023,6 +1056,27 @@ class Orders extends PS_Controller
 
 		if (! empty($order))
 		{
+			if ($order->must_approve)
+			{
+				$approver_id = $this->approver_model->is_approver($this->_user->id, $order->sale_team); //-- return id if approver of team  return false if not
+
+				if ($approver_id)
+				{
+					$visible_gp = $this->approver_model->is_visible_gp_approver($this->_user->id);
+					$brands = $this->approver_model->get_approver_brand($approver_id);
+
+					if (! empty($brands))
+					{
+						$brand = array();
+
+						foreach ($brands as $bs)
+						{
+							$brand[$bs->id_brand] = $bs->max_disc;
+						}
+					}
+				}
+			}
+
 			$details = $this->orders_model->get_details($order->code);
 
 			if (!empty($details))
@@ -1033,6 +1087,14 @@ class Orders extends PS_Controller
 					$pd = $this->products_model->get($rs->ItemCode);
 					$rs->master_pack = !empty($pd) ? ac_format($pd->min_order_qty, 2) : '-';
 					$totalAmount += $rs->LineTotal;
+					$rs->Cost = $order->Status == 0 ? $this->products_model->get_sap_item_avg_cost($rs->ItemCode) : $rs->Cost;
+					$margin = $rs->SellPrice - $rs->Cost;					
+					$rs->gp = 0;
+					if($rs->Cost > 0 && $margin > 0 && $rs->SellPrice > 0) $rs->gp = round(($margin / $rs->SellPrice) * 100, 2);
+					if($margin < 0 && $rs->Cost > 0) $rs->gp = round(($margin / $rs->Cost) * 100, 2);
+					$totalGp += $rs->gp;
+					$rowsCount++;
+					$totalCost += $rs->Cost;
 					$rs->image = get_image_path($rs->product_id, 'mini');
 					$rs->ruleCode = $this->discount_model->getRuleCode($rs->rule_id);
 
@@ -1059,35 +1121,14 @@ class Orders extends PS_Controller
 
 					$no++;
 				}
-			}
-
-			if ($order->must_approve)
-			{
-				$approver_id = $this->approver_model->is_approver($this->_user->id, $order->sale_team); //-- return id if approver of team  return false if not
-
-				if ($approver_id)
-				{
-					$visible_gp = $this->approver_model->is_visible_gp_approver($this->_user->id);
-					$brands = $this->approver_model->get_approver_brand($approver_id);
-
-					if (! empty($brands))
-					{
-						$brand = array();
-
-						foreach ($brands as $bs)
-						{
-							$brand[$bs->id_brand] = $bs->max_disc;
-						}
-					}
-				}
-			}
+			}		
 
 			$ds = array(
 				'order' => $order,
 				'details' => $details,
 				'totalAmount' => $totalAmount,
-				'totalCost' => $order->totalCost,
-				'totalGP' => $order->totalGP,
+				'totalCost' => $totalCost,
+				'totalGP' => $rowsCount > 0 ? ($totalGp / $rowsCount) : 0,
 				'visible_gp' => $visible_gp,
 				'promotions' => $promotions,
 				'sale_name' => $this->sales_person_model->get_name($order->SlpCode),

@@ -14,12 +14,18 @@ class PS_Controller extends CI_Controller
   public function __construct()
   {
     parent::__construct();    
+		
     $uid = get_cookie('uid');
 
 		if(empty($uid) || ! $this->user_model->verify_uid($uid))
 		{
-			redirect(base_url() . 'users/authentication');
-			return;
+			if(! $this->input->is_ajax_request()) {
+				redirect(base_url() . 'users/authentication');
+				exit;
+			}
+
+			echo "Session expired. Please login again.";
+			exit;			
 		}
 		
 		$this->_user = $this->user_model->get_user_by_uid($uid);

@@ -3,7 +3,7 @@
 		Discount Method : <span class="bold">P</span> = Percentage, <span class="bold">N</span> = Net Price, <span class="bold">F</span> = Premium
 	</div>
   <div class="col-sm-12 col-xs-12 padding-5 table-responsive">
-    <table class="table table-striped table-narrow border-1" style="min-width:1380px;">
+    <table class="table table-striped table-narrow border-1" style="min-width:1460px;">
       <thead>
         <tr class="font-size-10">
 					<th class="fix-width-40 text-center">#</th>
@@ -20,7 +20,8 @@
 					<th class="fix-width-120 middle text-right">PriceAfterDiscount</th>
           <th class="fix-width-120 middle text-right">Amount before tax</th>
 					<th class="fix-width-60 middle text-center">Method</th>
-					<th class="fix-width-100 middle text-center">Discount Rule</th>
+					<th class="fix-width-100 middle text-center">Discount Rule</th>					
+					<th class="fix-width-80 middle text-right">GP(%)</th>					
         </tr>
       </thead>
       <tbody id="details-template">
@@ -75,6 +76,7 @@
           <td class="middle text-right"><?php echo number($rs->LineTotal, 2); ?></td>
 					<td class="middle text-center"><?php echo $rs->discType; ?></td>										
 					<td class="middle text-center"><?php echo $rs->ruleCode; ?></td>
+					<td class="middle text-right"><?php echo (($is_approver && $visible_gp) || $this->_SuperAdmin) ? number($rs->gp, 2) .' %' : '-'; ?></td>
         </tr>
           <?php $no++; ?>
         <?php endforeach; ?>

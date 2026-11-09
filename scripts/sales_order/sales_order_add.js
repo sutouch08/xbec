@@ -1758,6 +1758,8 @@ function recalTotal() {
 	let df_rate = parseDefaultFloat($('#vat_rate').val(), 7); //--- default vat rate 7%
 	let taxRate = df_rate * 0.01;
 	let rounding = 0;
+	let rowCount = 0;
+	let totalGp = 0;
 
 	$('.line-num').each(function () {
 		let no = $(this).val();
@@ -1767,9 +1769,19 @@ function recalTotal() {
 		let amount = roundNumber(parseDefaultFloat($(`#line-total-${no}`).val(), 0.00), 2);
 		let rate = roundNumber(parseDefaultFloat($(`#vat-rate-${no}`).val(), 0.00), 2);
 
+		let sellPrice = roundNumber(parseDefaultFloat($(`#sell-price-${no}`).val(), 0.00), 2);
+		let cost = roundNumber(parseDefaultFloat($(`#cost-${no}`).val(), 0.00), 2);
+
 		if (qty > 0 && price > 0) {
 			total += amount;
 			totalCost += lineCost;
+
+			let gp = 0;
+			let margin = sellPrice - cost;
+			if(cost > 0 && margin > 0 && sellPrice > 0) gp = roundNumber((margin / sellPrice) * 100, 2);
+			if(cost > 0 && margin < 0) gp = roundNumber((margin / cost) * 100, 2);
+			totalGp += gp;
+			rowCount++;
 
 			if (rate > 0) {
 				totalTaxAmount += amount;
@@ -1800,7 +1812,7 @@ function recalTotal() {
 	let taxAmount = roundNumber(amountToPayTax * taxRate, 2);
 	let docTotal = roundNumber(amountAfterDisc + taxAmount + rounding, 2);
 	let totalProfit = roundNumber(amountAfterDisc - totalCost, 2);
-	let gp = amountAfterDisc != 0 ? roundNumber((totalProfit / amountAfterDisc) * 100, 2) : 0;
+	//let gp = amountAfterDisc != 0 ? roundNumber((totalProfit / amountAfterDisc) * 100, 2) : 0;
 	let creditBalance = roundNumber(availableCredit - docTotal, 2);
 
 	$('#totalAmount').val(total);
@@ -1810,7 +1822,7 @@ function recalTotal() {
 	$('#docTotal').val(docTotal);
 	$('#docTotalLabel').val(addCommas(docTotal.toFixed(2)));
 	$('#total-cost').val(totalCost);
-	$('#total-gp').val(gp);
+	$('#total-gp').val(rowCount > 0 ? roundNumber((totalGp / rowCount), 2) : 0);
 	$('#creditBalanceLabel').val(addCommas(creditBalance.toFixed(2)));
 }
 
