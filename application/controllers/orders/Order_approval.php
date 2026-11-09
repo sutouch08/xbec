@@ -19,6 +19,7 @@ class Order_approval extends PS_Controller
 		$this->load->model('orders/order_approval_model');
 		$this->load->model('orders/orders_model');
     $this->load->model('users/approver_model');    
+    $this->load->model('masters/products_model');
     $this->load->helper('payment_term');
     $this->load->helper('sales_team');
     $this->load->helper('channels');
@@ -58,8 +59,7 @@ class Order_approval extends PS_Controller
   }
 
   public function view_detail($code, $pageNo = 0)
-  {    
-    $this->load->model('masters/products_model');
+  {        
     $this->load->model('orders/discount_model');
     $this->load->model('discount/discount_policy_model');
     $this->load->model('masters/sales_person_model');
@@ -68,6 +68,9 @@ class Order_approval extends PS_Controller
     $this->load->helper('order');
     $this->load->helper('product_images');
 
+    $rowsCount = 0;
+    $totalGp = 0;    
+    $totalCost = 0;
     $totalAmount = 0;
     $approver_id = NULL;
     $visible_gp = FALSE;
@@ -89,6 +92,15 @@ class Order_approval extends PS_Controller
           $totalAmount += $rs->LineTotal;
           $rs->image = get_image_path($rs->product_id, 'mini');
           $rs->ruleCode = $this->discount_model->getRuleCode($rs->rule_id);
+
+          $rs->Cost = $order->Status == 0 ? $this->products_model->get_sap_item_avg_cost($rs->ItemCode) : $rs->Cost;
+          $margin = $rs->SellPrice - $rs->Cost;
+          $rs->gp = 0;
+          if ($rs->Cost > 0 && $margin > 0 && $rs->SellPrice > 0) $rs->gp = round(($margin / $rs->SellPrice) * 100, 2);
+          if ($margin < 0 && $rs->Cost > 0) $rs->gp = round(($margin / $rs->Cost) * 100, 2);
+          $totalGp += $rs->gp;
+          $rowsCount++;
+          $totalCost += $rs->Cost;
 
           if (! empty($rs->policy_id))
           {
@@ -140,8 +152,8 @@ class Order_approval extends PS_Controller
         'order' => $order,
         'details' => $details,
         'totalAmount' => $totalAmount,
-        'totalCost' => $order->totalCost,
-        'totalGP' => $order->totalGP,
+        'totalCost' => $totalCost,
+        'totalGP' => $rowsCount > 0 ? round($totalGp / $rowsCount, 2) : 0,
         'visible_gp' => $visible_gp,
         'promotions' => $promotions,
         'sale_name' => $this->sales_person_model->get_name($order->SlpCode),
@@ -196,7 +208,7 @@ class Order_approval extends PS_Controller
   }
 
   public function do_approve($code)
-  {
+  {    
     $sc = TRUE;    
     $doc = $this->orders_model->get($code);
 
@@ -214,7 +226,7 @@ class Order_approval extends PS_Controller
 
           $details = $this->orders_model->get_details($code);
 
-          if (!empty($details))
+          if (!empty($details) && ! $this->_SuperAdmin)
           {
             $brand = array();
 
@@ -265,10 +277,38 @@ class Order_approval extends PS_Controller
           {
             if ($this->_SuperAdmin or $can_approve === TRUE)
             {
+              $totalGp = 0;
+              $rowCount = 0;
+              $totalCost = 0;
+
+              if (! empty($details))
+              {
+                foreach ($details as $rs)
+                {
+                  $gp = 0;
+                  $cost = round($this->products_model->get_sap_item_avg_cost($rs->ItemCode) ?? 0, 2);
+                  $margin = $rs->SellPrice - $cost;
+                  if ($cost > 0 && $margin > 0 && $rs->SellPrice > 0) $gp = round(($margin / $rs->SellPrice) * 100, 2);
+                  if ($cost > 0 && $margin < 0) $gp = round(($margin / $cost) * 100, 2);
+                  $totalGp += $gp;
+                  $totalCost += round($cost * $rs->Qty, 2);
+                  $rowCount++;
+
+                  $arr = array(
+                    'Cost' => $cost,
+                    'totalCost' => round($cost * $rs->Qty, 2)
+                  );
+
+                  $this->orders_model->update_detail($rs->id, $arr);
+                }
+              }
+
               $arr = array(
+                'totalCost' => $totalCost,
+                'totalGp' => $rowCount > 0 ? round($totalGp / $rowCount, 2) : 0,
                 'Approved' => 'A',
                 'Approver' => $this->_user->uname
-              );
+              );              
 
               if (! $this->orders_model->update($code, $arr))
               {

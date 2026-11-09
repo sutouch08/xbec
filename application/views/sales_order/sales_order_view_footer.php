@@ -71,9 +71,9 @@
 
 			<?php if (($is_approver && $visible_gp) || $this->_SuperAdmin) : ?>
 				<div class="form-group">
-					<label class="col-lg-8 col-md-8 col-sm-7 col-xs-6 control-label no-padding-right">Total GP</label>
+					<label class="col-lg-8 col-md-8 col-sm-7 col-xs-6 control-label no-padding-right">Total GP (%)</label>
 					<div class="col-lg-4 col-md-4 col-sm-5 col-xs-6 padding-5 last">
-						<input type="text" class="form-control input-sm text-right" value="<?php echo number($totalGP, 2); ?> %" readonly />
+						<input type="text" class="form-control input-sm text-right" value="<?php echo number($totalGP, 2); ?>" readonly />
 					</div>
 				</div>
 			<?php endif; ?>

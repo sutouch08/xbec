@@ -76,7 +76,7 @@
           <td class="middle text-right"><?php echo number($rs->LineTotal, 2); ?></td>
 					<td class="middle text-center"><?php echo $rs->discType; ?></td>										
 					<td class="middle text-center"><?php echo $rs->ruleCode; ?></td>
-					<td class="middle text-right"><?php echo (($is_approver && $visible_gp) || $this->_SuperAdmin) ? number($rs->gp, 2) .' %' : '-'; ?></td>
+					<td class="middle text-right"><?php echo (($is_approver && $visible_gp) || $this->_SuperAdmin) ? number($rs->gp, 2) : '-'; ?></td>
         </tr>
           <?php $no++; ?>
         <?php endforeach; ?>
