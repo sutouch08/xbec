@@ -212,6 +212,42 @@ class Discount_rule extends PS_Controller
 								}
 							}
 						}
+
+						if($sc === TRUE && ! empty($ds->product_models))
+						{
+							foreach($ds->product_models as $models)
+							{
+								$arr = array(
+									"rule_id" => $id,
+									"models_id" => $models->id
+								);
+
+								if( ! $this->discount_rule_model->set_discount_rule_product_models($arr))
+								{
+									$sc = FALSE;
+									$this->error = "Insert product model rule failed";
+									break;
+								}
+							}
+						}
+
+						if($sc === TRUE && ! empty($ds->product_series))
+						{
+							foreach($ds->product_series as $series)
+							{
+								$arr = array(
+									"rule_id" => $id,
+									"series_id" => $series->id
+								);
+
+								if( ! $this->discount_rule_model->set_discount_rule_product_series($arr))
+								{
+									$sc = FALSE;
+									$this->error = "Insert product series rule failed";
+									break;
+								}
+							}
+						}
 					} //--- end if all_products == false
 
 					if($sc === TRUE && ! empty($ds->exclude_products))
@@ -473,6 +509,8 @@ class Discount_rule extends PS_Controller
 				"pdTypes" => $this->discount_rule_model->getRuleProductType($id),
 				"pdCategories" => $this->discount_rule_model->getRuleProductCategory($id),
 				"pdBrands" => $this->discount_rule_model->getRuleProductBrand($id),
+				"pdSeries" => $this->discount_rule_model->getRuleProductSeries($id),
+				"pdProductModels" => $this->discount_rule_model->getRuleProductModels($id),
 				"premiums" => $this->discount_rule_model->getRuleFreeProduct($id),
 				"pdExclude" => $this->discount_rule_model->getRuleExcludeProduct($id),
 				"channels" => $this->discount_rule_model->getRuleChannels($id),
@@ -587,6 +625,18 @@ class Discount_rule extends PS_Controller
 					{
 						$sc = FALSE;
 						$this->error = "Delete product brand rule failed";
+					}
+
+					if($sc === TRUE && ! $this->discount_rule_model->drop_rule_product_series($id))
+					{
+						$sc = FALSE;
+						$this->error = "Delete product series rule failed";
+					}
+
+					if($sc === TRUE && ! $this->discount_rule_model->drop_rule_product_models($id))
+					{
+						$sc = FALSE;
+						$this->error = "Delete product model rule failed";
 					}
 
 					if($sc === TRUE && ! $this->discount_rule_model->drop_rule_exclude_product($id))
@@ -742,6 +792,42 @@ class Discount_rule extends PS_Controller
 								{
 									$sc = FALSE;
 									$this->error = "Insert product brand rule failed";
+									break;
+								}
+							}
+						}
+
+						if($sc === TRUE && ! empty($ds->product_models))
+						{
+							foreach ($ds->product_models as $models)
+							{
+								$arr = array(
+									"rule_id" => $id,
+									"models_id" => $models->id
+								);
+
+								if (! $this->discount_rule_model->set_discount_rule_product_models($arr))
+								{
+									$sc = FALSE;
+									$this->error = "Insert product models rule failed";
+									break;
+								}
+							}
+						}
+
+						if($sc === TRUE && ! empty($ds->product_series))
+						{
+							foreach ($ds->product_series as $series)
+							{
+								$arr = array(
+									"rule_id" => $id,
+									"series_id" => $series->id
+								);
+
+								if (! $this->discount_rule_model->set_discount_rule_product_series($arr))
+								{
+									$sc = FALSE;
+									$this->error = "Insert product series rule failed";
 									break;
 								}
 							}
@@ -1029,6 +1115,8 @@ class Discount_rule extends PS_Controller
 				"pdTypes" => $this->discount_rule_model->getRuleProductType($id),
 				"pdCategories" => $this->discount_rule_model->getRuleProductCategory($id),
 				"pdBrands" => $this->discount_rule_model->getRuleProductBrand($id),
+				"pdProductModels" => $this->discount_rule_model->getRuleProductModels($id),
+				"pdSeries" => $this->discount_rule_model->getRuleProductSeries($id),
 				"premiums" => $this->discount_rule_model->getRuleFreeProduct($id),
 				"pdExclude" => $this->discount_rule_model->getRuleExcludeProduct($id),
 				"channels" => $this->discount_rule_model->getRuleChannels($id),

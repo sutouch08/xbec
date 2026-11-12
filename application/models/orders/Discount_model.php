@@ -24,7 +24,7 @@ class Discount_model extends CI_Model
 	}
 
 
-	public function get_item_discount($item_code, $customer_code, $price, $qty, $payment_id, $channels_id, $date = '', $order_code = NULL)
+	public function get_item_discount($item_code, $customer_code, $price, $qty, $payment_id, $channels_id, $date = '')
 	{
 		$this->load->model('masters/products_model');
 		$this->load->model('masters/customers_model');
@@ -85,6 +85,8 @@ class Discount_model extends CI_Model
 					->join('discount_rule_product_category AS pc', 'r.id = pc.rule_id', 'left')
 					->join('discount_rule_product_type AS pt', 'r.id = pt.rule_id', 'left')
 					->join('discount_rule_product_brand AS pb', 'r.id = pb.rule_id', 'left')
+					->join('discount_rule_product_models AS pms', 'r.id = pms.rule_id', 'left')
+					->join('discount_rule_product_series AS ps', 'r.id = ps.rule_id', 'left')
 					->join('discount_rule_customer AS c', 'r.id = c.rule_id', 'left')
 					->join('discount_rule_customer_group AS cg', 'r.id = cg.rule_id', 'left')
 					->join('discount_rule_customer_type AS ct', 'r.id = ct.rule_id', 'left')
@@ -119,6 +121,16 @@ class Discount_model extends CI_Model
 				if ($pd->brand_id != NULL)
 				{
 					$this->db->group_start()->where('pb.brand_id IS NULL', NULL, FALSE)->or_where('pb.brand_id', $pd->brand_id)->group_end();
+				}
+
+				if($pd->models_id != NULL)
+				{
+					$this->db->group_start()->where('pms.models_id IS NULL', NULL, FALSE)->or_where('pms.models_id', $pd->models_id)->group_end();
+				}
+
+				if($pd->series_id != NULL)
+				{
+					$this->db->group_start()->where('ps.series_id IS NULL', NULL, FALSE)->or_where('ps.series_id', $pd->series_id)->group_end();
 				}
 
 				//--- Customer Condition				
@@ -339,6 +351,8 @@ class Discount_model extends CI_Model
 				->join('discount_rule_product_category AS pc', 'r.id = pc.rule_id', 'left')
 				->join('discount_rule_product_type AS pt', 'r.id = pt.rule_id', 'left')
 				->join('discount_rule_product_brand AS pb', 'r.id = pb.rule_id', 'left')
+				->join('discount_rule_product_models AS pms', 'r.id = pms.rule_id', 'left')
+				->join('discount_rule_product_series AS ps', 'r.id = ps.rule_id', 'left')
 				->join('discount_rule_customer AS c', 'r.id = c.rule_id', 'left')
 				->join('discount_rule_customer_group AS cg', 'r.id = cg.rule_id', 'left')
 				->join('discount_rule_customer_type AS ct', 'r.id = ct.rule_id', 'left')
@@ -374,6 +388,16 @@ class Discount_model extends CI_Model
 			if ($pd->brand_id != NULL)
 			{
 				$this->db->group_start()->where('pb.brand_id IS NULL', NULL, FALSE)->or_where('pb.brand_id', $pd->brand_id)->group_end();
+			}
+
+			if ($pd->models_id != NULL)
+			{
+				$this->db->group_start()->where('pms.models_id IS NULL', NULL, FALSE)->or_where('pms.models_id', $pd->models_id)->group_end();
+			}
+
+			if ($pd->series_id != NULL)
+			{
+				$this->db->group_start()->where('ps.series_id IS NULL', NULL, FALSE)->or_where('ps.series_id', $pd->series_id)->group_end();
 			}
 
 			//---- Customer Condition			
@@ -485,6 +509,7 @@ class Discount_model extends CI_Model
 	public function count_order_rule_group($order_code, $rule_id, $all_product, $all_customer, $all_channels, $all_payment)
 	{
 		$qr = "SELECT od.Qty, od.Price FROM order_details AS od ";
+
 		if (! $all_product)
 		{
 			$qr .= "LEFT JOIN discount_rule_product AS p ON od.product_id = p.product_id ";
@@ -492,6 +517,8 @@ class Discount_model extends CI_Model
 			$qr .= "LEFT JOIN discount_rule_product_category AS pc ON od.product_category_id = pc.category_id ";
 			$qr .= "LEFT JOIN discount_rule_product_type AS pt ON od.product_type_id = pt.type_id ";
 			$qr .= "LEFT JOIN discount_rule_product_brand AS pb ON od.product_brand_id = pb.brand_id ";
+			$qr .= "LEFT JOIN discount_rule_product_models AS pms ON od.product_model_id = pms.model_id ";
+			$qr .= "LEFT JOIN discount_rule_product_series AS ps ON od.product_series_id = ps.series_id ";
 		}
 
 		if (! $all_customer)
@@ -518,7 +545,7 @@ class Discount_model extends CI_Model
 
 		if (! $all_product)
 		{
-			$qr .= "AND (p.rule_id = {$rule_id} OR pm.rule_id = {$rule_id} OR pc.rule_id = {$rule_id} OR pt.rule_id = {$rule_id}) OR pb.rule_id = {$rule_id} ";
+			$qr .= "AND (p.rule_id = {$rule_id} OR pm.rule_id = {$rule_id} OR pc.rule_id = {$rule_id} OR pt.rule_id = {$rule_id} OR pb.rule_id = {$rule_id} OR pms.rule_id = {$rule_id} OR ps.rule_id = {$rule_id}) ";
 		}
 
 		if (! $all_customer)

@@ -15,24 +15,24 @@
   </div>
   <!-- SKU -->
   <div class="form-group">
-    <label class="col-lg-1-harf col-md-2 col-sm-2 col-xs-12 form-label">SKU</label>    
+    <label class="col-lg-1-harf col-md-2 col-sm-2 col-xs-12 form-label">SKU</label>
     <div class="col-lg-6 col-md-8 col-sm-8 col-xs-12" style="max-height:300px; overflow-y:auto; margin-top:10px;">
       <table class="table table-striped table-hover table-narrow border-1" style="min-width:450px; margin-bottom:0px;">
         <thead>
-          <tr>            
+          <tr>
             <th class="fix-width-40 text-center">#</th>
             <th class="fix-width-150">SKU</th>
-            <th class="min-width-250">Description</th>            
+            <th class="min-width-250">Description</th>
           </tr>
         </thead>
         <tbody id="include-product-table">
           <?php if (!empty($products)) : ?>
             <?php $no = 1; ?>
             <?php foreach ($products as $rs) : ?>
-              <tr>                
+              <tr>
                 <td class="middle text-center in-no"><?php echo $no; ?></td>
                 <td class="middle"><?php echo $rs->code; ?></td>
-                <td class="middle"><?php echo $rs->name; ?></td>               
+                <td class="middle"><?php echo $rs->name; ?></td>
               </tr>
               <?php $no++; ?>
             <?php endforeach; ?>
@@ -90,32 +90,54 @@
     </div>
   </div>
 
+  <!-- models -->
+  <div class="form-group">
+    <label class="col-lg-1-harf col-md-2 col-sm-2 col-xs-12 form-label">Models</label>
+    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+      <select class="width-100 select2" id="product-models" multiple="multiple" data-placeholder="No models selected" disabled>
+        <option value="">&nbsp;</option>
+        <?php echo selectMultipleProductModels($pdProductModels); ?>
+      </select>
+    </div>
+  </div>
+
+  <!-- series -->
+  <div class="form-group">
+    <label class="col-lg-1-harf col-md-2 col-sm-2 col-xs-12 form-label">Series</label>
+    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+      <select class="width-100 select2" id="product-series" multiple="multiple" data-placeholder="No series selected" disabled>
+        <option value="">&nbsp;</option>
+        <?php echo selectMultipleSeries($pdSeries); ?>
+      </select>
+    </div>
+  </div>
+
   <div class="divider"></div>
 
   <div class="form-group">
     <label class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
       <h4 class="bold">Exclude</h4>
     </label>
-  </div>  
+  </div>
   <div class="form-group">
     <label class="col-lg-1-harf col-md-2 col-sm-2 col-xs-12 form-label">SKU</label>
     <div class="col-lg-6 col-md-8 col-sm-8 col-xs-12" style="max-height:300px; overflow-y:auto;">
       <table class="table table-striped table-hover table-narrow border-1" style="min-width:450px;">
         <thead>
-          <tr>            
+          <tr>
             <th class="fix-width-40 text-center">#</th>
             <th class="fix-width-150">SKU</th>
-            <th class="min-width-250">Description</th>            
+            <th class="min-width-250">Description</th>
           </tr>
         </thead>
         <tbody id="exclude-product-table">
           <?php if (!empty($pdExclude)) : ?>
             <?php $no = 1; ?>
             <?php foreach ($pdExclude as $rs) : ?>
-              <tr>                
+              <tr>
                 <td class="middle text-center ex-no"><?php echo $no; ?></td>
                 <td class="middle"><?php echo $rs->code; ?></td>
-                <td class="middle"><?php echo $rs->name; ?></td>                
+                <td class="middle"><?php echo $rs->name; ?></td>
               </tr>
               <?php $no++; ?>
             <?php endforeach; ?>
@@ -137,16 +159,16 @@
     </label>
   </div>
   <div class="form-group">
-    <label class="col-lg-1 col-md-1 col-sm-1 col-xs-12 form-label">SKU</label>    
+    <label class="col-lg-1 col-md-1 col-sm-1 col-xs-12 form-label">SKU</label>
     <div class="col-lg-8 col-md-11 col-sm-11 col-xs-12" style="max-height:300px; overflow-y:auto;">
       <table class="table table-striped table-hover table-narrow border-1" style="min-width:550px; margin-bottom:0px;">
         <thead>
-          <tr>            
+          <tr>
             <th class="fix-width-40 text-center">#</th>
             <th class="fix-width-100">SKU</th>
             <th class="min-width-250">Description</th>
             <th class="fix-width-80 text-right">Std. Price</th>
-            <th class="fix-width-80 text-right">Net Price</th>            
+            <th class="fix-width-80 text-right">Net Price</th>
           </tr>
         </thead>
         <tbody id="net-price-table">
@@ -154,12 +176,12 @@
             <?php if (!empty($products)) : ?>
               <?php $no = 1; ?>
               <?php foreach ($products as $rs) : ?>
-                <tr>                  
+                <tr>
                   <td class="middle text-center np-no"><?php echo $no; ?></td>
                   <td class="middle"><?php echo $rs->code; ?></td>
                   <td class="middle"><?php echo $rs->name; ?></td>
                   <td class="middle text-right"><?php echo number($rs->price, 2); ?></td>
-                  <td class="middle text-right"><?php echo number($rs->sell_price, 2); ?></td>                   
+                  <td class="middle text-right"><?php echo number($rs->sell_price, 2); ?></td>
                 </tr>
                 <?php $no++; ?>
               <?php endforeach; ?>
@@ -201,6 +223,18 @@
 
   $('#product-brand').select2({
     placeholder: "Please select",
+    closeOnSelect: false,
+    allowClear: true,
+  });
+
+  $('#product-models').select2({
+    placeholder: "No models selected",
+    closeOnSelect: false,
+    allowClear: true,
+  });
+
+  $('#product-series').select2({
+    placeholder: "No series selected",
     closeOnSelect: false,
     allowClear: true,
   });

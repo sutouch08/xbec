@@ -353,7 +353,7 @@ class Discount_policy extends PS_Controller
     $id = $this->input->post('id');
     $active = $this->input->post('active');
 
-    if(! $this->approver_model->is_promotion_approver($this->_user->id))
+    if(! $this->approver_model->is_promotion_approver($this->_user->id) && ! $this->_SuperAdmin)
     {
       $sc = FALSE;
       set_error('permission');

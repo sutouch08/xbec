@@ -114,6 +114,28 @@
     </div>
   </div>
 
+  <!-- models -->
+  <div class="form-group">
+    <label class="col-lg-1-harf col-md-2 col-sm-2 col-xs-12 form-label">Models</label>
+    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+      <select class="width-100 select2" id="product-models" multiple="multiple" <?php echo $p_active; ?>>
+        <option value="">&nbsp;</option>
+        <?php echo selectMultipleProductModels($pdProductModels); ?>
+      </select>
+    </div>
+  </div>
+
+  <!-- series -->
+  <div class="form-group">
+    <label class="col-lg-1-harf col-md-2 col-sm-2 col-xs-12 form-label">Series</label>
+    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+      <select class="width-100 select2" id="product-series" multiple="multiple" <?php echo $p_active; ?>>
+        <option value="">&nbsp;</option>
+        <?php echo selectMultipleSeries($pdSeries); ?>
+      </select>
+    </div>
+  </div>
+
   <div class="divider"></div>
 
   <div class="form-group">
@@ -190,7 +212,7 @@
     <div class="col-lg-1-harf col-md-2 col-sm-2 col-xs-4 padding-5">
       <input type="file" class="hide" id="net-price-file" accept=".xlsx" />
       <button type="button" class="btn btn-xs btn-success btn-white btn-block" id="btn-import-net-price" onclick="getNetPriceFile()"><i class="fa fa-plus"></i> Import Excel</button>
-    </div>    
+    </div>
     <div class="col-lg-7-harf col-lg-offset-1-harf col-md-11 col-md-offset-1 col-sm-11 col-sm-offset-1 col-xs-12" style="max-height:300px; overflow-y:auto;">
       <table class="table table-striped table-hover table-narrow border-1" style="min-width:640px; margin-bottom:0px; margin-top:10px;">
         <thead>
@@ -273,6 +295,18 @@
   });
 
   $('#product-brand').select2({
+    placeholder: "Please select",
+    closeOnSelect: false,
+    allowClear: true,
+  });
+
+  $('#product-series').select2({
+    placeholder: "Please select",
+    closeOnSelect: false,
+    allowClear: true,
+  });
+
+  $('#product-models').select2({
     placeholder: "Please select",
     closeOnSelect: false,
     allowClear: true,

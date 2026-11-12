@@ -117,6 +117,44 @@ function selectMultipleCategory(array $selected = array())
 	return $ds;
 }
 
+function selectMultipleProductModels(array $selected = array())
+{
+	$ds = '';
+	$ci = &get_instance();
+	$ci->load->model('masters/product_models_model');
+	$option = $ci->product_models_model->get_all();
+
+	if (! empty($option))
+	{
+		foreach ($option as $rs)
+		{
+			$se = in_array($rs->id, $selected) ? 'selected' : '';
+			$ds .= "<option data-id=\"{$rs->id}\" data-code=\"{$rs->code}\" data-name=\"{$rs->name}\" value=\"{$rs->id}\" {$se}>{$rs->name}</option>";
+		}
+	}
+
+	return $ds;
+}
+
+function selectMultipleSeries(array $selected = array())
+{
+	$ds = '';
+	$ci = &get_instance();
+	$ci->load->model('masters/product_series_model');
+	$option = $ci->product_series_model->get_all();
+
+	if (! empty($option))
+	{
+		foreach ($option as $rs)
+		{
+			$se = in_array($rs->id, $selected) ? 'selected' : '';
+			$ds .= "<option data-id=\"{$rs->id}\" data-code=\"{$rs->code}\" data-name=\"{$rs->name}\" value=\"{$rs->id}\" {$se}>{$rs->name}</option>";
+		}
+	}
+
+	return $ds;
+}
+
 function selectMultipleSalesTeam(array $selected = array())
 {
 	$ds = '';

@@ -24,6 +24,8 @@ class Sync_product_master extends CI_Controller
 		$this->syncProductType();
 		$this->syncProductBrand();
 		$this->syncProductModel();
+		$this->syncProductModels();
+		$this->syncProductSeries();
 		$this->syncProducts();
   }
 
@@ -198,6 +200,133 @@ class Sync_product_master extends CI_Controller
 		$this->sync_logs_model->add_logs($arr);
 	}
 
+	public function syncProductSeries()
+	{
+		$sc = TRUE;
+		$update = 0;
+		$limit = 100;
+		$offset = 0;
+		$max_loop = 100; // Maximum number of loops to prevent infinite loop
+
+		$this->load->model('masters/product_series_model');
+		$count = $this->product_series_model->countProductSeries();
+
+		if($count > 0)
+		{
+			while($count > $update && $max_loop > 0)
+			{
+				$ds = $this->product_series_model->getProductSeries($limit, $offset);
+
+				if(!empty($ds))
+				{
+					foreach($ds as $rs)
+					{
+						$id = $this->product_series_model->get_id($rs->Code);
+
+						if($id)
+						{
+							$arr = array(
+								'code' => $rs->Code,
+								'name' => $rs->Name,
+								'last_sync' => now()
+							);
+
+							$this->product_series_model->update($id, $arr);
+						}
+						else 
+						{
+							$arr = array(
+								'code' => $rs->Code,
+								'name' => $rs->Name,
+								'last_sync' => now()
+							);
+
+							$this->product_series_model->add($arr);
+						}
+
+						$update++;
+						$offset++;
+					}
+				}
+
+				$max_loop--;
+			}
+		}		
+
+		$arr = array(
+			'type' => 'Product Series',
+			'status' => $sc === TRUE ? 'S' : 'E',
+			'qty' => $update,
+			'message' =>  NULL
+		);
+
+		$this->sync_logs_model->add_logs($arr);
+	}
+
+	public function syncProductModels()
+	{
+		$sc = TRUE;
+		$update = 0;
+		$limit = 100;
+		$offset = 0;
+		$max_loop = 100; // Maximum number of loops to prevent infinite loop
+
+		$this->load->model('masters/product_models_model');
+		$count = $this->product_models_model->countProductModels();
+
+		if ($count > 0)
+		{
+			while ($count > $update && $max_loop > 0)
+			{
+				$ds = $this->product_models_model->getProductModels($limit, $offset);
+
+				if (!empty($ds))
+				{
+					foreach ($ds as $rs)
+					{
+						$id = $this->product_models_model->get_id($rs->Code);
+
+						if ($id)
+						{
+							$arr = array(
+								'code' => $rs->Code,
+								'name' => $rs->Name,
+								'last_sync' => now()
+							);
+
+							$this->product_models_model->update($id, $arr);
+						}
+						else
+						{
+							$arr = array(
+								'code' => $rs->Code,
+								'name' => $rs->Name,
+								'last_sync' => now()
+							);
+
+							$this->product_models_model->add($arr);
+						}
+
+						$update++;
+						$offset++;
+					}
+				}
+
+				$max_loop--;
+			}
+		}
+
+		$arr = array(
+			'type' => 'Product Models',
+			'status' => $sc === TRUE ? 'S' : 'E',
+			'qty' => $update,
+			'message' =>  NULL
+		);
+
+		$this->sync_logs_model->add_logs($arr);
+	}
+
+
 	public function syncProducts()
 	{
 		$sc = TRUE;
@@ -236,6 +365,8 @@ class Sync_product_master extends CI_Controller
 								"brand_code" => empty($rs->U_Product_Brand) ? NULL : $rs->U_Product_Brand,
 								"type_code" => empty($rs->U_Product_Type) ? NULL : $rs->U_Product_Type,
 								"category_code" => empty($rs->U_Product_Category) ? NULL : $rs->U_Product_Category,
+								"models_code" => empty($rs->U_Product_Models) ? NULL : $rs->U_Product_Models,
+								"series_code" => empty($rs->U_Product_Series) ? NULL : $rs->U_Product_Series,
 								"min_order_qty" => empty($rs->MinOrdrQty) ? 0 : get_zero($rs->MinOrdrQty),
 								"status" => empty($rs->validFor) ? 1 : ($rs->validFor == 'N' ? 0 : 1),
 								"last_sync" => now()
@@ -294,31 +425,7 @@ class Sync_product_master extends CI_Controller
 
 		$this->sync_logs_model->add_logs($arr);
 	}
-	
-	public function update_parent_category($code)
-	{
-		$this->load->model('masters/product_category_model');
-		$rs = $this->db->distinct()->select('category_code')->where('code', $code)->get('products');
-
-		if($rs->num_rows() == 1)
-		{
-			$list = $this->product_category_model->get_parent_list($rs->row()->category_code);
-
-			if( ! empty($list))
-			{
-				$arr = array(
-					"category_code_1" => $list->l1,
-					"category_code_2" => $list->l2,
-					"category_code_3" => $list->l3,
-					"category_code_4" => $list->l4,
-					"category_code_5" => $list->l5
-				);
-
-				$this->db->where('code', $code)->update('products', $arr);
-			}
-		}
-	}
-
+		
 	public function update_item_parent_category($code)
 	{
 		$this->load->model('masters/product_category_model');

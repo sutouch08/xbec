@@ -41,6 +41,7 @@ class Projects extends PS_Controller
     $update = 0;
     $limit = 100;
     $offset = 0;
+    $max_loop = 1000;
 
     $this->load->model('sync_logs_model');
     $this->load->library('hana');
@@ -52,7 +53,7 @@ class Projects extends PS_Controller
     {
       $total = $count;      
        
-      while ($total > $update)
+      while ($total > $update && $max_loop > 0)
       {
         $ds = $this->project_model->getUpdateProject($last_sync, $limit, $offset);            
 
@@ -89,6 +90,8 @@ class Projects extends PS_Controller
             $offset++;
           }
         }
+        
+        $max_loop--;
       }
     }
 

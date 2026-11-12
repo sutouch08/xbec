@@ -54,6 +54,8 @@ function add() {
     'discount': [],
     'products': [],
     'models': [],
+    'product_models': [],
+    'product_series': [],
     'product_types': [],
     'product_categories': [],
     'product_brands': [],
@@ -74,9 +76,7 @@ function add() {
   }
 
   let valid_products = h.all_products == 1 ? 1 : 0; //-- to check if there is at least 1 product in the list or if all_products is checked
-  let valid_customers = h.all_customers == 1 ? 1 : 0; //-- to check if there is at least 1 customer in the list or if all_customers is checked
-  let valid_channels = h.all_channels == 1 ? 1 : 0; //-- to check if there is at least 1 channel in the list or if all_channels is checked
-  let valid_payments = h.all_payments == 1 ? 1 : 0; //-- to check if there is at least 1 payment in the list or if all_payments is checked
+  let valid_customers = h.all_customers == 1 ? 1 : 0; //-- to check if there is at least 1 customer in the list or if all_customers is checked  
   let valid_premiums = 0; //-- to check if there is at least 1 premium in the list
 
   //--- disacount step
@@ -165,7 +165,23 @@ function add() {
           h.product_brands.push({ 'id': brand });
         });
         valid_products++;
-      } 
+      }
+
+      let pdModels = $('#product-models').val();
+      if(pdModels && pdModels.length > 0) {
+        pdModels.forEach(model => {
+          h.product_models.push({ 'id': model });
+        });
+        valid_products++;
+      }
+      
+      let series = $('#product-series').val();
+      if(series && series.length > 0) {
+        series.forEach(s => {
+          h.product_series.push({ 'id': s });
+        });
+        valid_products++;
+      }
     }
 
     if (valid_products == 0) {
@@ -346,6 +362,8 @@ function update() {
     'discount': [],
     'products': [],
     'models': [],
+    'product_models': [],
+    'product_series': [],
     'product_types': [],
     'product_categories': [],
     'product_brands': [],
@@ -366,9 +384,7 @@ function update() {
   }
 
   let valid_products = h.all_products == 1 ? 1 : 0; //-- to check if there is at least 1 product in the list or if all_products is checked
-  let valid_customers = h.all_customers == 1 ? 1 : 0; //-- to check if there is at least 1 customer in the list or if all_customers is checked
-  let valid_channels = h.all_channels == 1 ? 1 : 0; //-- to check if there is at least 1 channel in the list or if all_channels is checked
-  let valid_payments = h.all_payments == 1 ? 1 : 0; //-- to check if there is at least 1 payment in the list or if all_payments is checked
+  let valid_customers = h.all_customers == 1 ? 1 : 0; //-- to check if there is at least 1 customer in the list or if all_customers is checked  
   let valid_premiums = 0; //-- to check if there is at least 1 premium in the list
 
   //--- disacount step
@@ -455,6 +471,22 @@ function update() {
       if (brands && brands.length > 0) {
         brands.forEach(brand => {
           h.product_brands.push({ 'id': brand });
+        });
+        valid_products++;
+      }
+
+      let pdModels = $('#product-models').val();
+      if (pdModels && pdModels.length > 0) {
+        pdModels.forEach(model => {
+          h.product_models.push({ 'id': model });
+        });
+        valid_products++;
+      }
+
+      let series = $('#product-series').val();
+      if (series && series.length > 0) {
+        series.forEach(s => {
+          h.product_series.push({ 'id': s });
         });
         valid_products++;
       }

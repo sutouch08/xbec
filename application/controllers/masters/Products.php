@@ -23,10 +23,12 @@ class Products extends PS_Controller
 		$filter = array(
 			'code' => get_filter('code', 'item_code', ''),
 			'name' => get_filter('name', 'item_name', ''),
-			'model' => get_filter('model', 'item_model', ''),
+			'model' => get_filter('model', 'item_model', 'all'),
 			'category' => get_filter('category', 'item_category', 'all'),
 			'type' => get_filter('type', 'item_type', 'all'),
 			'brand' => get_filter('brand', 'item_brand', 'all'),
+			'models' => get_filter('models', 'item_models', 'all'),
+			'series' => get_filter('series', 'item_series', 'all'),
 			'status' => get_filter('status', 'item_status', 'all'),
 			'count_stock' => get_filter('count_stock', 'count_stock', 'all'),
 			'allow_change_discount' => get_filter('allow_change_discount', 'allow_change_discount', 'all'),
@@ -381,6 +383,8 @@ class Products extends PS_Controller
 						"brand_code" => empty($rs->U_Product_Brand) ? NULL : $rs->U_Product_Brand,
 						"type_code" => empty($rs->U_Product_Type) ? NULL : $rs->U_Product_Type,
 						"category_code" => empty($rs->U_Product_Category) ? NULL : $rs->U_Product_Category,
+						"models_code" => empty($rs->U_Product_Models) ? NULL : $rs->U_Product_Models,
+						"series_code" => empty($rs->U_Product_Series) ? NULL : $rs->U_Product_Series,
 						"min_order_qty" => empty($rs->MinOrdrQty) ? 0 : get_zero($rs->MinOrdrQty),
 						"status" => empty($rs->validFor) ? 1 : ($rs->validFor == 'N' ? 0 : 1),
 						"last_sync" => now()
@@ -531,6 +535,8 @@ class Products extends PS_Controller
 					'brand_code' => empty($item->U_Product_Brand) ? NULL : $item->U_Product_Brand,
 					'type_code' => empty($item->U_Product_Type) ? NULL : $item->U_Product_Type,
 					'category_code' => empty($item->U_Product_Category) ? NULL : $item->U_Product_Category,
+					'models_code' => empty($item->U_Product_Models) ? NULL : $item->U_Product_Models,
+					'series_code' => empty($item->U_Product_Series) ? NULL : $item->U_Product_Series,
 					'min_order_qty' => empty($item->MinOrdrQty) ? 0 : get_zero($item->MinOrdrQty),
 					'status' => empty($item->validFor) ? 1 : ($item->validFor == 'N' ? 0 : 1)
 				);
@@ -576,6 +582,8 @@ class Products extends PS_Controller
 			'item_type',
 			'item_category',
 			'item_brand',
+			'item_models',
+			'item_series',
 			'item_status',
 			'count_stock',
 			'customer_view',

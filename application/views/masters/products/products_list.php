@@ -26,12 +26,31 @@
 
 		<div class="col-lg-1-harf col-md-2 col-sm-2 col-xs-6 padding-5">
 			<label>Model</label>
-			<input type="text" class="form-control input-sm" name="model" value="<?php echo $model; ?>" />
+			<select class="form-control input-sm" name="model" id="model" onchange="getSearch()">
+				<option value="all">ทั้งหมด</option>
+				<?php echo select_product_model($model); ?>
+			</select>			
+		</div>
+
+		<div class="col-lg-1-harf col-md-2 col-sm-2 col-xs-6 padding-5">
+			<label>Models</label>
+			<select class="form-control input-sm" name="models" id="models" onchange="getSearch()">
+				<option value="all">ทั้งหมด</option>
+				<?php echo select_product_models($models); ?>
+			</select>			
+		</div>
+
+		<div class="col-lg-1-harf col-md-2 col-sm-2 col-xs-6 padding-5">
+			<label>Series</label>
+			<select class="form-control input-sm" name="series" id="series" onchange="getSearch()">
+				<option value="all">ทั้งหมด</option>
+				<?php echo select_product_series($series); ?>
+			</select>			
 		</div>
 
 		<div class="col-lg-1-harf col-md-2 col-sm-2 col-xs-6 padding-5">
 			<label>Category</label>
-			<select class="form-control input-sm" name="category" onchange="getSearch()">
+			<select class="form-control input-sm" name="category" id="category" onchange="getSearch()">
 				<option value="all">ทั้งหมด</option>
 				<?php echo select_category_level(5, $category); ?>
 			</select>
@@ -39,7 +58,7 @@
 
 		<div class="col-lg-1-harf col-md-2 col-sm-2 col-xs-6 padding-5">
 			<label>Type</label>
-			<select class="form-control input-sm" name="type" onchange="getSearch()">
+			<select class="form-control input-sm" name="type" id="type" onchange="getSearch()">
 				<option value="all">ทั้งหมด</option>
 				<?php echo select_product_type($type); ?>
 			</select>
@@ -47,7 +66,7 @@
 
 		<div class="col-lg-1-harf col-md-2 col-sm-2 col-xs-6 padding-5">
 			<label>Brand</label>
-			<select class="form-control input-sm" name="brand" onchange="getSearch()">
+			<select class="form-control input-sm" name="brand" id="brand" onchange="getSearch()">
 				<option value="all">ทั้งหมด</option>
 				<?php echo select_product_brand($brand); ?>
 			</select>
@@ -104,18 +123,20 @@
 <?php echo $this->pagination->create_links(); ?>
 <div class="row">
 	<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 padding-5 table-responsive">
-		<table class="table table-striped table-narrow border-1" style="min-width:1270px;">
+		<table class="table table-striped table-narrow border-1" style="min-width:1520px;">
 			<thead>
 				<tr>
 					<th class="fix-width-90"></th>
 					<th class="fix-width-40 middle text-center">#</th>
 					<th class="fix-width-60 middle text-center">Img</th>
 					<th class="fix-width-100 middle">Code</th>
-					<th class="min-width-200 middle">Name</th>
+					<th class="min-width-250 middle">Name</th>
 					<th class="fix-width-100 middle">Model</th>
 					<th class="fix-width-100 middle">Type</th>
 					<th class="fix-width-150 middle">Category</th>
 					<th class="fix-width-100 middle">Brand</th>
+					<th class="fix-width-100 middle">Models</th>
+					<th class="fix-width-100 middle">Series</th>
 					<th class="fix-width-80 middle text-center">Master pack</th>
 					<th class="fix-width-60 middle text-center">Status</th>
 					<th class="fix-width-60 middle text-center">Stock</th>
@@ -144,6 +165,8 @@
 							<td class="middle"><?php echo $rs->type_name; ?></td>
 							<td class="middle"><?php echo $rs->category_name; ?></td>
 							<td class="middle"><?php echo $rs->brand_name; ?></td>
+							<td class="middle"><?php echo $rs->models_name; ?></td>
+							<td class="middle"><?php echo $rs->series_name; ?></td>
 							<td class="middle text-center"><?php echo ac_format($rs->min_order_qty); ?></td>
 							<td class="middle text-center"><?php echo is_active($rs->status); ?></td>
 							<td class="middle text-center">
@@ -169,7 +192,7 @@
 					<?php endforeach; ?>
 				<?php else : ?>
 					<tr>
-						<td colspan="14" class="middle text-center">--- No data ---</td>
+						<td colspan="16" class="middle text-center">--- No data ---</td>
 					</tr>
 				<?php endif; ?>
 			</tbody>
@@ -177,6 +200,14 @@
 	</div>
 </div>
 
+<script>
+	$('#model').select2();
+	$('#models').select2();
+	$('#series').select2();
+	$('#category').select2();
+	$('#type').select2();
+	$('#brand').select2();
+</script>
 <script src="<?php echo base_url(); ?>scripts/masters/products.js?v=<?php echo date('Ymd'); ?>"></script>
 <script src="<?php echo base_url(); ?>scripts/masters/sync_product.js?v=<?php echo date('Ymd'); ?>"></script>
 

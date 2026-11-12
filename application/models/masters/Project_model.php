@@ -196,37 +196,10 @@ class Project_model extends CI_Model
 		return '2021-01-01';
 	}
 
-
-	// public function countUpdateProject($last_sync)
-	// {
-	// 	$qr = "SELECT COUNT(*) AS num_rows FROM BEC2.OPRJ WHERE [UpdateDate] >= '{$last_sync}'";
-	// 	$result = $this->conn->query($this->hana->SQLtoHANA($qr));
-	// 	$rows = $result->fetchAll();
-
-	// 	if (count($rows) === 1)
-	// 	{
-	// 		return $rows[0][0];
-	// 	}
-
-	// 	return 0;
-	// }
-
-
-	// public function getUpdateProject($last_sync, $limit = 100, $offset = 0)
-	// {
-	// 	$qr = "SELECT [PrjCode], [PrjName], [Active] 
-	//         FROM BEC2.OPRJ 
-	//         WHERE [UpdateDate] >= '{$last_sync}' 
-	//         ORDER BY [PrjCode] ASC 
-	//         LIMIT {$limit} OFFSET {$offset}";
-	// 	$result = $this->conn->query($this->hana->SQLtoHANA($qr));
-	// 	return $result->fetchAll(PDO::FETCH_ASSOC);
-	// }
-
 	public function countUpdateProject($last_sync)
 	{
 		$db = $this->config->item('hana_database');
-		$qr = "SELECT COUNT(*) AS num_rows FROM {$db}.OPRJ WHERE [UpdateDate] >= '{$last_sync}'";
+		$qr = "SELECT COUNT(*) AS num_rows FROM {$db}.[OPRJ] WHERE [UpdateDate] >= '{$last_sync}'";
 		$result = odbc_exec($this->conn, $this->hana->SQLtoHANA($qr));
 		return odbc_fetch_array($result)['NUM_ROWS'];		
 	}
@@ -236,7 +209,7 @@ class Project_model extends CI_Model
 		$db = $this->config->item('hana_database');
 
 		$qr = "SELECT [PrjCode], [PrjName], [Active] 
-		      FROM {$db}.OPRJ 
+		      FROM {$db}.[OPRJ] 
 		      WHERE [UpdateDate] >= '{$last_sync}' 
 		      ORDER BY [PrjCode] ASC 
 		      LIMIT {$limit} OFFSET {$offset}";

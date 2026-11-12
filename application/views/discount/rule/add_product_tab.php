@@ -93,6 +93,28 @@
     </div>
   </div>
 
+  <!-- Modles -->
+  <div class="form-group">
+    <label class="col-lg-1-harf col-md-2 col-sm-2 col-xs-12 form-label">Models</label>
+    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+      <select class="width-100 select2" id="product-models" multiple="multiple">
+        <option value="">&nbsp;</option>
+        <?php echo selectMultipleProductModels(); ?>
+      </select>
+    </div>
+  </div>
+
+  <!-- Series -->
+  <div class="form-group">
+    <label class="col-lg-1-harf col-md-2 col-sm-2 col-xs-12 form-label">Series</label>
+    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+      <select class="width-100 select2" id="product-series" multiple="multiple">
+        <option value="">&nbsp;</option>
+        <?php echo selectMultipleSeries(); ?>
+      </select>
+    </div>
+  </div>
+
   <div class="divider"></div>
 
   <div class="form-group">
@@ -201,6 +223,18 @@
   });
 
   $('#product-brand').select2({
+    placeholder: "Please select",
+    closeOnSelect: false,
+    allowClear: true,
+  });
+
+  $('#product-series').select2({
+    placeholder: "Please select",
+    closeOnSelect: false,
+    allowClear: true,
+  });
+  
+  $('#product-models').select2({
     placeholder: "Please select",
     closeOnSelect: false,
     allowClear: true,

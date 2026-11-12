@@ -98,7 +98,7 @@
 							<td class="middle"><?php echo thai_date($rs->start_date, FALSE, '.'); ?></td>
 							<td class="middle"><?php echo thai_date($rs->end_date, FALSE, '.'); ?></td>
 							<td class="middle text-center">
-								<?php if($can_approve) : ?>
+								<?php if($can_approve || $this->_SuperAdmin) : ?>
 									<label>
 										<input type="checkbox" class="ace ace-switch ace-switch-6" style="height:22px;" <?php echo is_checked(1, $rs->active); ?> onclick="setActive(<?php echo $rs->id; ?>, this)" />
 										<span class="lbl"></span>

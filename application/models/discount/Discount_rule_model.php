@@ -586,6 +586,38 @@ class Discount_rule_model extends CI_Model
 		return $ds;
 	}
 
+	public function getRuleProductModels($id)
+	{
+		$ds = [];
+		$rs = $this->db->where('rule_id', $id)->get('discount_rule_product_models');
+
+		if ($rs->num_rows() > 0)
+		{
+			foreach ($rs->result() as $rs)
+			{
+				$ds[] = $rs->models_id;
+			}
+		}
+
+		return $ds;
+	}
+
+	public function getRuleProductSeries($id)
+	{
+		$ds = [];
+		$rs = $this->db->where('rule_id', $id)->get('discount_rule_product_series');
+
+		if ($rs->num_rows() > 0)
+		{
+			foreach ($rs->result() as $rs)
+			{
+				$ds[] = $rs->series_id;
+			}
+		}
+
+		return $ds;
+	}
+
 	public function getRuleProductType($id)
 	{
 		$ds = [];
@@ -676,62 +708,32 @@ class Discount_rule_model extends CI_Model
 	//------------------------  Customer Rule -------------//
 	public function set_discount_rule_customer(array $ds = array())
 	{
-		if (! empty($ds))
-		{
-			return $this->db->insert("discount_rule_customer", $ds);
-		}
-
-		return FALSE;
+		return ! empty($ds) ? $this->db->insert("discount_rule_customer", $ds) : FALSE;
 	}
 
 	public function set_discount_rule_customer_region(array $ds = array())
 	{
-		if (! empty($ds))
-		{
-			return $this->db->insert("discount_rule_customer_region", $ds);
-		}
-
-		return FALSE;
+		return ! empty($ds) ? $this->db->insert("discount_rule_customer_region", $ds) : FALSE;
 	}
 
 	public function set_discount_rule_customer_group(array $ds = array())
 	{
-		if (! empty($ds))
-		{
-			return $this->db->insert("discount_rule_customer_group", $ds);
-		}
-
-		return FALSE;
+		return ! empty($ds) ? $this->db->insert("discount_rule_customer_group", $ds) : FALSE;
 	}
 
 	public function set_discount_rule_customer_type(array $ds = array())
 	{
-		if (! empty($ds))
-		{
-			return $this->db->insert("discount_rule_customer_type", $ds);
-		}
-
-		return FALSE;
+		return ! empty($ds) ? $this->db->insert("discount_rule_customer_type", $ds) : FALSE;
 	}
 
 	public function set_discount_rule_customer_area(array $ds = array())
 	{
-		if (! empty($ds))
-		{
-			return $this->db->insert("discount_rule_customer_area", $ds);
-		}
-
-		return FALSE;
+		return ! empty($ds) ? $this->db->insert("discount_rule_customer_area", $ds) : FALSE;
 	}
 
 	public function set_discount_rule_customer_grade(array $ds = array())
 	{
-		if (! empty($ds))
-		{
-			return $this->db->insert("discount_rule_customer_grade", $ds);
-		}
-
-		return FALSE;
+		return ! empty($ds) ? $this->db->insert("discount_rule_customer_grade", $ds) : FALSE;
 	}
 
 	public function drop_rule_customer($rule_id)
@@ -772,72 +774,47 @@ class Discount_rule_model extends CI_Model
 	//-------  Product Rule -------------//
 	public function set_discount_rule_free_product(array $ds = array())
 	{
-		if (! empty($ds))
-		{
-			return $this->db->insert("discount_rule_free_product", $ds);
-		}
-
-		return FALSE;
+		return ! empty($ds) ? $this->db->insert("discount_rule_free_product", $ds) : FALSE;
 	}
 
 	public function set_discount_rule_product(array $ds = array())
 	{
-		if (! empty($ds))
-		{
-			return $this->db->insert("discount_rule_product", $ds);
-		}
-
-		return FALSE;
+		return ! empty($ds) ? $this->db->insert("discount_rule_product", $ds) : FALSE;
 	}
 
 	public function set_discount_rule_exclude_product(array $ds = array())
 	{
-		if (! empty($ds))
-		{
-			return $this->db->insert("discount_rule_product_exclude", $ds);
-		}
-
-		return FALSE;
+		return ! empty($ds) ? $this->db->insert("discount_rule_product_exclude", $ds) : FALSE;
 	}
 
 	public function set_discount_rule_product_model(array $ds = array())
 	{
-		if (! empty($ds))
-		{
-			return $this->db->insert("discount_rule_product_model", $ds);
-		}
-
-		return FALSE;
+		return ! empty($ds) ? $this->db->insert("discount_rule_product_model", $ds) : FALSE;
 	}
 
 	public function set_discount_rule_product_category(array $ds = array())
 	{
-		if (! empty($ds))
-		{
-			return $this->db->insert("discount_rule_product_category", $ds);
-		}
-
-		return FALSE;
+		return ! empty($ds) ? $this->db->insert("discount_rule_product_category", $ds) : FALSE;
 	}
 
 	public function set_discount_rule_product_type(array $ds = array())
 	{
-		if (! empty($ds))
-		{
-			return $this->db->insert("discount_rule_product_type", $ds);
-		}
-
-		return FALSE;
+		return ! empty($ds) ? $this->db->insert("discount_rule_product_type", $ds) : FALSE;
 	}
 
 	public function set_discount_rule_product_brand(array $ds = array())
 	{
-		if (! empty($ds))
-		{
-			return $this->db->insert("discount_rule_product_brand", $ds);
-		}
+		return ! empty($ds) ? $this->db->insert("discount_rule_product_brand", $ds) : FALSE;
+	}
 
-		return FALSE;
+	public function set_discount_rule_product_models(array $ds = array())
+	{
+		return ! empty($ds) ? $this->db->insert('discount_rule_product_models', $ds) : FALSE;		
+	}
+
+	public function set_discount_rule_product_series(array $ds = array())
+	{
+		return ! empty($ds) ? $this->db->insert('discount_rule_product_series', $ds) : FALSE;		
 	}
 
 	public function drop_rule_product($rule_id)
@@ -873,6 +850,16 @@ class Discount_rule_model extends CI_Model
 	public function drop_rule_free_product($rule_id)
 	{
 		return $this->db->where('rule_id', $rule_id)->delete('discount_rule_free_product');
+	}
+
+	public function drop_rule_product_models($rule_id)
+	{
+		return $this->db->where('rule_id', $rule_id)->delete('discount_rule_product_models');
+	}
+
+	public function drop_rule_product_series($rule_id)
+	{
+		return $this->db->where('rule_id', $rule_id)->delete('discount_rule_product_series');
 	}
 	//------- end Product Rule -------------//
 

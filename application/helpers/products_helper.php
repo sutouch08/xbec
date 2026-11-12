@@ -179,6 +179,42 @@ function select_product_model($code = NULL)
 	return $ds;
 }
 
+function select_product_models($code = NULL)
+{
+	$ci =& get_instance();
+	$ci->load->model('masters/product_models_model');
+	$ds = '';
+	$option = $ci->product_models_model->get_all();
+
+	if( ! empty($option))
+	{
+		foreach($option as $rs)
+		{
+			$ds .= '<option data-id="'.$rs->id.'" value="'.$rs->code.'" '.is_selected($code, $rs->code).'>'.$rs->name.'</option>';
+		}
+	}
+
+	return $ds;
+}
+
+function select_product_series($code = NULL)
+{
+	$ci =& get_instance();
+	$ci->load->model('masters/product_series_model');
+	$ds = '';
+	$option = $ci->product_series_model->get_all();
+
+	if( ! empty($option))
+	{
+		foreach($option as $rs)
+		{
+			$ds .= '<option data-id="'.$rs->id.'" value="'.$rs->code.'" '.is_selected($code, $rs->code).'>'.$rs->name.'</option>';
+		}
+	}
+
+	return $ds;
+}
+
 function model_in($txt = "")
 {
 	$sc = [-1];

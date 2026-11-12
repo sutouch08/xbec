@@ -48,6 +48,8 @@ class Products_model extends CI_Model
 			->select('pc.id AS category_id, pc.code AS category_code, pc.name AS category')
 			->select('pt.id AS type_id, pt.code AS type_code, pt.name AS type')
 			->select('pb.id AS brand_id, pb.code AS brand_code, pb.name AS brand')
+			->select('ms.id AS models_id, ms.code AS models_code, ms.name AS models')
+			->select('sr.id AS series_id, sr.code AS series_code, sr.name AS series')
 			->select('u.code AS uom_code, u.name AS uom')
 			->select('vg.rate AS vat_rate')
 			->from('products AS pd')
@@ -56,6 +58,8 @@ class Products_model extends CI_Model
 			->join('product_type AS pt', 'pd.type_code = pt.code', 'left')
 			->join('product_brand AS pb', 'pd.brand_code = pb.code', 'left')
 			->join('uom AS u', 'pd.uom_id = u.id', 'left')
+			->join('product_models AS ms', 'pd.models_code = ms.code', 'left')
+			->join('product_series AS sr', 'pd.series_code = sr.code', 'left')
 			->join('vat_group AS vg', 'pd.vat_group = vg.code', 'left');
 
 		$rs = $this->db->where('pd.code', $code)->get();
@@ -77,6 +81,8 @@ class Products_model extends CI_Model
 			->select('pc.id AS category_id, pc.code AS category_code, pc.name AS category')
 			->select('pt.id AS type_id, pt.code AS type_code, pt.name AS type')
 			->select('pb.id AS brand_id, pb.code AS brand_code, pb.name AS brand')
+			->select('ms.id AS models_id, ms.code AS models_code, ms.name AS models')
+			->select('sr.id AS series_id, sr.code AS series_code, sr.name AS series')
 			->select('u.code AS uom_code, u.name AS uom')
 			->select('vg.rate AS vat_rate')
 			->from('products AS pd')
@@ -84,6 +90,8 @@ class Products_model extends CI_Model
 			->join('product_category AS pc', 'pd.category_code = pc.code', 'left')
 			->join('product_type AS pt', 'pd.type_code = pt.code', 'left')
 			->join('product_brand AS pb', 'pd.brand_code = pb.code', 'left')
+			->join('product_models AS ms', 'pd.models_code = ms.code', 'left')
+			->join('product_series AS sr', 'pd.series_code = sr.code', 'left')
 			->join('uom AS u', 'pd.uom_id = u.id', 'left')
 			->join('vat_group AS vg', 'pd.vat_group = vg.code', 'left');
 
@@ -169,9 +177,9 @@ class Products_model extends CI_Model
 			$this->db->like('name', $ds['name']);
 		}
 
-		if (isset($ds['model']) && $ds['model'] != "")
+		if (isset($ds['model']) && $ds['model'] != "all")
 		{
-			$this->db->where_in('model_code', model_in($ds['model']));
+			$this->db->where('model_code', $ds['model']);
 		}
 
 		if (isset($ds['category']) && $ds['category'] != 'all')
@@ -187,6 +195,16 @@ class Products_model extends CI_Model
 		if (isset($ds['brand']) && $ds['brand'] != 'all')
 		{
 			$this->db->where('brand_code', $ds['brand']);
+		}
+		
+		if (isset($ds['models']) && $ds['models'] != 'all')
+		{
+			$this->db->where('models_code', $ds['models']);
+		}
+
+		if (isset($ds['series']) && $ds['series'] != 'all')
+		{
+			$this->db->where('series_code', $ds['series']);
 		}
 
 		if (isset($ds['status']) && $ds['status'] != 'all')
@@ -221,11 +239,15 @@ class Products_model extends CI_Model
 			->select('pg.name AS category_name')
 			->select('pt.name AS type_name')
 			->select('pb.name AS brand_name')
+			->select('ms.name AS models_name')
+			->select('sr.name AS series_name')
 			->from('products AS pd')
 			->join('product_model AS pm', 'pd.model_code = pm.code', 'left')
 			->join('product_category AS pg', 'pd.category_code = pg.code', 'left')
 			->join('product_type AS pt', 'pd.type_code = pt.code', 'left')
-			->join('product_brand AS pb', 'pd.brand_code = pb.code', 'left');
+			->join('product_brand AS pb', 'pd.brand_code = pb.code', 'left')
+			->join('product_models AS ms', 'pd.models_code = ms.code', 'left')
+			->join('product_series AS sr', 'pd.series_code = sr.code', 'left');
 
 		if (isset($ds['code']) && $ds['code'] != "")
 		{
@@ -237,9 +259,9 @@ class Products_model extends CI_Model
 			$this->db->like('pd.name', $ds['name']);
 		}
 
-		if (isset($ds['model']) && $ds['model'] != "")
+		if (isset($ds['model']) && $ds['model'] != 'all')
 		{
-			$this->db->where_in('pd.model_code', model_in($ds['model']));
+			$this->db->where('pd.model_code', $ds['model']);
 		}
 
 		if (isset($ds['category']) && $ds['category'] != 'all')
@@ -255,6 +277,16 @@ class Products_model extends CI_Model
 		if (isset($ds['brand']) && $ds['brand'] != 'all')
 		{
 			$this->db->where('pd.brand_code', $ds['brand']);
+		}
+		
+		if (isset($ds['models']) && $ds['models'] != 'all')
+		{
+			$this->db->where('pd.models_code', $ds['models']);
+		}
+
+		if (isset($ds['series']) && $ds['series'] != 'all')
+		{
+			$this->db->where('pd.series_code', $ds['series']);
 		}
 
 		if (isset($ds['status']) && $ds['status'] != 'all')
@@ -519,7 +551,7 @@ class Products_model extends CI_Model
 		$db = $this->config->item('hana_database'); 
 		$qr = "SELECT T0.[ItemCode], T0.[ItemName], T0.[CodeBars], T0.[VatGourpSa], T0.[validFor], 
 						T0.[U_Product_Model], T0.[U_Product_Category], T0.[U_Product_Brand], T0.[U_Product_Type], 						
-						T0.[MinOrdrQty], T0.[SUoMEntry], T1.[Price], T2.[Price] AS [Cost]
+						T0.[U_Product_Models], T0.[U_Product_Series], T0.[MinOrdrQty], T0.[SUoMEntry], T1.[Price], T2.[Price] AS [Cost]
 					FROM {$db}.OITM T0 
 					LEFT JOIN {$db}.ITM1 T1 ON T0.[ItemCode] = T1.[ItemCode] AND T1.[PriceList] = 1 
 					LEFT JOIN {$db}.ITM1 T2 ON T0.[ItemCode] = T2.[ItemCode] AND T2.[PriceList] = 15
@@ -543,7 +575,7 @@ class Products_model extends CI_Model
 		$db = $this->config->item('hana_database'); 
 		$qr = "SELECT T0.[ItemCode], T0.[ItemName], T0.[CodeBars], T0.[VatGourpSa], T0.[validFor], 
 						T0.[U_Product_Model], T0.[U_Product_Category], T0.[U_Product_Brand], T0.[U_Product_Type], 						
-						T0.[MinOrdrQty], T0.[SUoMEntry], T1.[Price], T2.[Price] AS [Cost]
+						T0.[U_Product_Models], T0.[U_Product_Series], T0.[MinOrdrQty], T0.[SUoMEntry], T1.[Price], T2.[Price] AS [Cost]
 					FROM {$db}.OITM T0 
 					LEFT JOIN {$db}.ITM1 T1 ON T0.[ItemCode] = T1.[ItemCode] AND T1.[PriceList] = 1 
 					LEFT JOIN {$db}.ITM1 T2 ON T0.[ItemCode] = T2.[ItemCode] AND T2.[PriceList] = 15

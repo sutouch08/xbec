@@ -999,38 +999,36 @@ function addSpace(text) {
 	return text.trim() === "" ? "" : text + " ";
 }
 
-function get_available_credit(code, orderCode = null) {
-	$.ajax({
-		url: `${HOME}get_credit_balance`,
-		type: 'POST',
-		cache: false,
-		data: {
-			'CardCode': code,
-			'orderCode': orderCode
-		},
-		success: function (rs) {
-			if (isJson(rs)) {
-				let ds = JSON.parse(rs);
-				if (ds.status === 'success') {
-					let available = parseDefaultFloat(ds.balance, 0);
-					$('#available-credit').val(addCommas(available.toFixed(2)));
-					recalTotal();
-				}
-				else {
-					console.log(ds.message);
-					$('#available-credit').val('0.00');
-				}
-			}
-			else {
-				console.log(rs);
-				$('#available-credit').val('0.00');
-			}
-		},
-		error: function (rs) {
-			console.log(rs);
+async function get_available_credit(CardCode, orderCode = null) {	
+	const url = `${HOME}get_credit_balance`;
+	const data = {
+		CardCode : CardCode,
+		orderCode : orderCode
+	};
+
+	try {
+		const response = await fetch(url, {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json'
+			},
+			body: JSON.stringify(data)
+		});
+
+		let result = await response.json();
+		if (result && result.status === 'success') {
+			let available = parseDefaultFloat(result.balance, 0);
+			$('#available-credit').val(addCommas(available.toFixed(2)));
+			recalTotal();
+		}
+		else {
 			$('#available-credit').val('0.00');
 		}
-	});
+	}
+	catch (error) {
+		console.log(error);
+		$('#available-credit').val('0.00');
+	}	
 }
 
 async function addRow(no = null) {
