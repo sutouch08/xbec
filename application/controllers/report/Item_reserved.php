@@ -40,6 +40,8 @@ class Item_reserved extends PS_Controller
     if (! empty($data))
     {
       $no = 1;
+      $totalQty = 0;
+      $totalAmount = 0;
 
       foreach ($data as $rs)
       {       
@@ -56,8 +58,15 @@ class Item_reserved extends PS_Controller
           'amount' => number($rs->LineTotal, 2)
         ];
 
+        $totalQty += $rs->Qty;
+        $totalAmount += $rs->LineTotal;
         $no++;
       }
+
+      $ds[] = (object) [
+        'totalQty' => number($totalQty),
+        'totalAmount' => number($totalAmount, 2)
+      ];
     }
     else
     {

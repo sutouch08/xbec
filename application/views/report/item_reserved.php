@@ -80,6 +80,14 @@
 				<td colspan="10" class="middle text-center font-size-24">--- NO DATA FOUND ---</td>
 			</tr>
 		{{else}}
+			{{#if @last}}
+				<tr>
+					<td colspan="8" class="middle text-right">Total</td>
+					<td class="middle text-right">{{totalQty}}</td>
+					<td class="middle text-right">{{totalAmount}}</td>
+					<td class="middle text-center"></td>
+				</tr>
+			{{else}}
 			<tr>
 				<td class="middle text-center no">{{no}}</td>
 				<td class="middle">{{date}}</td>
@@ -93,6 +101,7 @@
 				<td class="middle text-right">{{amount}}</td>
 				<td class="middle text-center"></td>
 			</tr>
+			{{/if}}
 		{{/if}}
 	{{/each}}
 </script>
