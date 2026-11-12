@@ -331,7 +331,11 @@ class Customers_model extends CI_Model
 
 	public function get_customer_sales_team_list()
 	{
-		$rs = $this->db->select('SaleTeam AS code, SaleTeamName AS name')->where('SaleTeam IS NOT NULL', NULL, FALSE)->group_by('SaleTeam')->get($this->tb);
+		$rs = $this->db
+		->select('SaleTeam AS code, SaleTeamName AS name')
+		->where('SaleTeam IS NOT NULL', NULL, FALSE)
+		->group_by('SaleTeam')
+		->get($this->tb);
 
 		if($rs->num_rows() > 0)
 		{

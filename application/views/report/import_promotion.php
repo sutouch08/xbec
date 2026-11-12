@@ -24,7 +24,7 @@
       <input type="text" class="form-control input-sm text-center search-box" name="customer" value="<?php echo $customer; ?>" />
     </div>
     <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12 padding-5">
-      <label><?php echo $header['C']; ?></label>
+      <label><?php echo empty($header['C']) ? 'Undefined fiilter' : $header['C']; ?></label>
       <select class="form-control input-sm filter" name="division" id="division">
         <option value="all">All</option>
         <?php echo $division_list; ?>
@@ -32,7 +32,7 @@
     </div>
 
     <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12 padding-5">
-      <label><?php echo $header['D']; ?></label>
+      <label><?php echo empty($header['D']) ? 'Undefined filter' : $header['D']; ?></label>
       <select class="form-control input-sm filter" name="sales" id="sales">
         <option value="all">All</option>
         <?php echo $sales_list; ?>
