@@ -24,6 +24,7 @@ class Order_api
 		$this->url = $this->url[-1] != '/' ? $this->url."/GetCreditBalance" : $this->url."GetCreditBalance";
 		$json = json_encode(array('CardCode' => $CardCode));
 		$this->timeout = 3; 
+		$req_start = now(TRUE);
 				
 		$curl = curl_init();
 		curl_setopt($curl, CURLOPT_URL, $this->url);
@@ -41,7 +42,29 @@ class Order_api
 			$response = curl_error($curl);
 		}		
 
-		$rs = json_decode($response);			
+		$rs = json_decode($response);
+
+		if ($this->logJson)
+		{
+			$this->ci->load->model('rest/api_logs_model');
+
+			$logs = array(
+				'trans_id' => genUid(),
+				'api_path' => $this->url,
+				'type' => 'CR',
+				'code' => $CardCode,
+				'action' => $this->action,
+				'status' => ! empty($rs) && $rs->status == 'success' ? 'success' : 'failed',
+				'message' => ! empty($rs) && $rs->status == 'success' ? 'success' : $this->error,
+				'request_json' => $json,
+				'response_json' => $response,
+				'req_start' => isset($req_start) ? $req_start : now(TRUE),
+				'req_end' => isset($req_end) ? $req_end : now(TRUE),
+				'user' => isset($user) ? $user : 'system'
+			);
+
+			$this->ci->api_logs_model->add_logs($logs);
+		}
 
 		if(! empty($rs) && ! empty($rs->status))
 		{

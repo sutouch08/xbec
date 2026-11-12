@@ -24,6 +24,7 @@
 			<label>Type</label>
 			<select class="width-100 filter" name="type">
 				<option value="all">All</option>
+				<option value="CR" <?php echo is_selected('CR', $type); ?>>Credit Balance</option>
 				<option value="SQ" <?php echo is_selected('SQ', $type); ?>>Sales Quotation</option>
 				<option value="SO" <?php echo is_selected('SO', $type); ?>>Sales Order</option>
 				<option value="pd-item" <?php echo is_selected('pd-item', $type); ?>>Product Item</option>

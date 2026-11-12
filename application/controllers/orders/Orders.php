@@ -93,8 +93,9 @@ class Orders extends PS_Controller
 	public function get_credit_balance()
 	{
 		$sc = TRUE;
-		$CardCode = trim($this->input->post('CardCode') ?? '');
-		$orderCode = trim($this->input->post('orderCode') ?? '');
+		$ds = json_decode(file_get_contents('php://input'));
+		$CardCode = trim($ds->CardCode ?? '');
+		$orderCode = trim($ds->orderCode ?? '');
 		$available = 0;
 		$balance = 0;
 
