@@ -15,6 +15,7 @@ $menu_sub_group_code = isset($this->menu_sub_group_code) ? $this->menu_sub_group
 					<a href="#" class="dropdown-toggle">
 						<i class="menu-icon fa <?php echo $menuGroup->icon; ?>"></i>
 						<span class="menu-text"><?php echo $menuGroup->name; ?></span>
+						<span class="badge badge-danger hide" id="menu-group-<?php echo $menuGroup->code; ?>">5</span>
 						<b class="arrow fa fa-angle-down"></b>
 					</a>
 					<?php $count_menu = $this->menu->count_menu($menuGroup->code); ?>

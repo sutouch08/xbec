@@ -1,18 +1,18 @@
 <div class="row">
-  <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 padding-5">
-    <button type="button" class="btn btn-white btn-info" onclick="addRow()">Add Row</button>
-    <button type="button" class="btn btn-white btn-warning" onclick="removeRow()">Delete Row</button>
-    <button type="button" class="btn btn-white btn-success" onclick="getImportFile()">Import Excel</button>
-    <button type="button" class="btn btn-white btn-purple" onclick="getTemplateFile()">Download Template</button>
+  <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12 padding-5">
+    <button type="button" class="btn btn-white btn-info margin-top-5" onclick="addRow()">Add Row</button>
+    <button type="button" class="btn btn-white btn-warning margin-top-5" onclick="removeRow()">Delete Row</button>
+    <button type="button" class="btn btn-white btn-success margin-top-5" onclick="getImportFile()">Import Excel</button>
+    <button type="button" class="btn btn-white btn-purple margin-top-5" onclick="getTemplateFile()">Download Template</button>
   </div>
-  <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 padding-5">
+  <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12 padding-5">
     <p class="pull-right" id="free-box"></p>
   </div>
   <div class="hide" id="free-temp"></div>
   <div class="divider-hidden">
 
   </div>
-  <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 border-1 table-responsive" style="height:400px; overflow:auto; padding:0px; margin-left:5px;">
+  <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 border-1 table-responsive" style="min-height:300px; overflow:auto; padding:0px; margin-left:5px;">
     <table class="table table-bordered border-1 tableFixHead" style="min-width:2170px;">
       <thead>
         <tr class="font-size-10 freez">
@@ -43,6 +43,7 @@
       <tbody id="details-template">
         <?php $rows = 5; ?>
         <?php $no = 1; ?>
+        <?php $uid = ""; ?>
         <?php if (!empty($details)) : ?>
           <?php $parent = array(); ?>
           <?php $disabled = ""; ?>

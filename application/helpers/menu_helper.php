@@ -19,7 +19,7 @@ function active_menu($menu, $code)
 }
 
 
-function side_menu($menu_code, $code, $url, $name)
+function side_menu($menu_code, $code, $url, $name,)
 {
   $menu = '';
   $menu .= '<li class="'.active_menu($menu_code, $code).'">';

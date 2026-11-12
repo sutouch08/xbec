@@ -30,7 +30,9 @@
 		<script src="<?php echo base_url(); ?>assets/js/ace/ace.sidebar-scroll-1.js"></script>
 		<script src="<?php echo base_url(); ?>assets/js/ace/ace.submenu-hover.js"></script>
 		<script src="<?php echo base_url(); ?>scripts/template.js?v=<?php echo date('Ymd'); ?>"></script>
-
+		<?php if(isset($this->_isApprover) && $this->_isApprover): ?>
+			<script src="<?php echo base_url(); ?>scripts/sync_approve_order.js?v=<?php echo date('Ymd'); ?>"></script>
+		<?php endif; ?>
 	</body>
 
 </html>

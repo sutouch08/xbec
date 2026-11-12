@@ -354,3 +354,58 @@
 		<span class="label label-info label-white middle pointer" title="{{code}}">{{name}} @row : {{#each rows}} {{no}},{{/each}}</span>
 	{{/each}}
 </script>
+
+
+<div class="modal fade" id="creditDetailModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+	<div class="modal-dialog" style="width:350px; max-width: 90vw;">
+		<div class="modal-content">
+			<div class="modal-header" style="border-bottom:solid 1px #e5e5e5;">
+				<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+				<h4 class="modal-title-site text-center" id="modal-title" style="margin-bottom:0px;">รายละเอียดเครดิต</h4>
+			</div>
+			<div class="modal-body">
+				<div class="row">
+					<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" id="credit-detail-table">
+
+					</div>
+				</div>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-md btn-default" data-dismiss="modal">Close</button>
+			</div>
+		</div>
+	</div>
+</div>
+
+<script id="credit-detail-template" type="text/x-handlebars-template">
+	<h4 class="title-xs text-center" style="margin-top:0px; margin-bottom:10px;">{{CardCode}}</h4>
+	<table class="table table-bordered border-1" style="margin-bottom:0px;">
+		<tr>
+			<td class="width-50 middle">Credit Limit (1)</td>
+			<td class="middle text-right">{{CreditLine}}</td>
+		</tr>
+		<tr>
+			<td class="middle">Account Balance (2)</td>
+			<td class="middle text-right">{{Balance}}</td>
+		</tr>
+		<tr>
+			<td class="middle">Debit Notes (3)</td>
+			<td class="middle text-right">{{DNotesBal}}</td>
+		</tr>
+		<tr>
+			<td class="middle">Sales Orders (4)</td>
+			<td class="middle text-right">{{OrdersBal}}</td>
+		</tr>
+		<tr>
+			<td class="middle">Web Orders (5)</td>
+			<td class="middle text-right">{{OrderUsed}}</td>
+		</tr>
+		<tr>
+			<td class="middle">
+			Available Credit <br/>
+			(1) - (2) - (3) - (4) - (5)
+			</td>	
+			<td class="middle text-right">{{CreditBalance}}</td>
+		</tr>
+	</table>
+</script>

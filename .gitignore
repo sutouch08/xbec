@@ -14,3 +14,4 @@ index.php
 /application/config/config.php
 /application/config/database.php
 /application/controllers/Test_hana.php
+/application/logs/*.php

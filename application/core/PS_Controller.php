@@ -8,6 +8,7 @@ class PS_Controller extends CI_Controller
 	public $_user;
 	public $_SuperAdmin = FALSE;
 	public $_customer = FALSE;	
+	public $_isApprover = FALSE;
   public $error;
 	public $close_system;
 
@@ -32,6 +33,7 @@ class PS_Controller extends CI_Controller
 		$this->close_system   = getConfig('CLOSE_SYSTEM'); //--- ปิดระบบทั้งหมดหรือไม่
 		$this->_SuperAdmin = $this->_user->id_profile == -987654321 ? TRUE : FALSE;
 		$this->_customer = empty($this->_user->customer_code) ? FALSE : TRUE;
+		$this->_isApprover = ($this->_user->ap_order == 1 && $this->_user->ap_status == 1) ? TRUE : FALSE;
 
     if($this->close_system == 1 && $this->_SuperAdmin === FALSE)
     {

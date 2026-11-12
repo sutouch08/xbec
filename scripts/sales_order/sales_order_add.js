@@ -91,6 +91,42 @@ async function getAvailableReserve(orderCode = null) {
 	}
 }
 
+async function getCreditDetails() {
+	let cardCode = $('#CardCode').val().trim();
+	let orderCode = $('#code').val().trim();
+
+	const url = `${HOME}get_credit_details`;
+	const data = {
+		CardCode: cardCode,
+		OrderCode: orderCode
+	};
+
+	try {
+		const response = await fetch(url, {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json'
+			},
+			body: JSON.stringify(data)
+		});
+
+		let result = await response.json();
+
+		if (result.status === 'success') {
+			let template = $('#credit-detail-template').html();
+			let output = $('#credit-detail-table');
+			render(template, result.data, output);
+
+			$('#creditDetailModal').modal('show');
+		}
+
+		return null;
+	} catch (err) {
+		console.error('Validation error:', err);
+		return null;
+	}
+}
+
 function getFreeItemRule() {
 	removeFreeRow();
 

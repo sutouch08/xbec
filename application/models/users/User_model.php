@@ -71,13 +71,19 @@ class User_model extends CI_Model
 
   public function get_user_by_uid($uid)
   {
-    $rs = $this->db->where('uid', $uid)->get($this->tb);
+    $rs = $this->db
+		->select('u.*, ap.ap_order, ap.status as ap_status')
+		->from('user AS u')
+		->join('approver AS ap', 'u.id = ap.user_id', 'left')
+		->where('uid', $uid)
+		->get();
+
     if($rs->num_rows() === 1)
     {
       return $rs->row();
     }
 
-    return FALSE;
+    return NULL;
   }
 
   public function get_by_uname($uname)

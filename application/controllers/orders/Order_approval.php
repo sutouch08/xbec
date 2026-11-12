@@ -432,6 +432,16 @@ class Order_approval extends PS_Controller
     return $sc;
   }
 
+  public function count_approval_orders()
+  {    
+    $count = $this->order_approval_model->count_rows([]);
+    $arr = array(
+      'count' => $count
+    );
+
+    echo json_encode($arr);
+  }
+
   public function clear_filter()
   {
     $filter = [

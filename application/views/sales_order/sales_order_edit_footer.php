@@ -103,7 +103,7 @@
 </div>
 
 <div class="row">
-  <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 padding-5">
+  <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12 padding-5">
     <p class="margin-top-15" id="promotions-applied">Promotions applied :
       <?php if (!empty($promotions)) : ?>
         <?php foreach ($promotions as $promo) : ?>
@@ -117,7 +117,7 @@
     </p>
   </div>
 
-  <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 padding-5 text-right">
+  <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12 padding-5 text-right">
     <button type="button" class="btn btn-white btn-default btn-100" onclick="leave()">Cancel</button>
     <button type="button" class="btn btn-white btn-info btn-100" id="btn-check-free" onclick="getFreeItemRule()">ตรวจสอบของ Premium</button>
     <div class="btn-group dropup">

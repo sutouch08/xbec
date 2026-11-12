@@ -65,9 +65,9 @@ class Orders extends PS_Controller
 			redirect($this->home);
 		}
 		else
-		{			
+		{
 			$perpage = get_rows();
-			$rows = $this->orders_model->count_rows($filter);			
+			$rows = $this->orders_model->count_rows($filter);
 			$filter['data'] = $this->orders_model->get_list($filter, $perpage, $this->uri->segment($this->segment));
 			$init	= pagination_config($this->home . '/index/', $rows, $perpage, $this->segment);
 			$this->pagination->initialize($init);
@@ -98,17 +98,15 @@ class Orders extends PS_Controller
 		$available = 0;
 		$balance = 0;
 
-		if (! is_true(getConfig('TEST')))
-		{
-			$this->load->library('order_api');
-			$balance = $this->order_api->getCreditBalance($CardCode);
+		$this->load->library('order_api');
+		$balance = $this->order_api->getCreditBalance($CardCode);
 
-			if ($balance === FALSE)
-			{
-				$sc = FALSE;
-				$this->error = "Failed to get credit balance";
-			}
+		if ($balance === FALSE)
+		{
+			$sc = FALSE;
+			$this->error = "Failed to get credit balance";
 		}
+
 
 		$used = $this->orders_model->get_credit_used($CardCode, $orderCode);
 
@@ -146,6 +144,49 @@ class Orders extends PS_Controller
 		}
 
 		return $creditBalance;
+	}
+
+	public function get_credit_details()
+	{
+		$sc = TRUE;
+		$ds = json_decode(file_get_contents('php://input'));
+		$CardCode = trim($ds->CardCode ?? '');
+		$orderCode = trim($ds->OrderCode ?? '');
+		$res = array(
+			'CardCode' => $CardCode,
+			'CreditLine' => 0.00,
+			'Balance' => 0.00,
+			'DNotesBal' => 0.00,
+			'OrdersBal' => 0.00,
+			'OrderUsed' => 0,
+			'CreditBalance' => 0.00
+		);
+
+		if (! empty($CardCode))
+		{
+			$this->load->library('hana');
+			$this->conn = $this->hana->connect();
+			$credit = $this->customers_model->get_credit_details($CardCode, $orderCode);
+			$used = $this->orders_model->get_credit_used($CardCode, $orderCode);
+
+			if (! empty($credit))
+			{
+				$res['CreditLine'] = number(floatval($credit->CreditLine), 2);
+				$res['Balance'] = number(floatval($credit->Balance), 2);
+				$res['DNotesBal'] = number(floatval($credit->DNotesBal), 2);
+				$res['OrdersBal'] = number(floatval($credit->OrdersBal), 2);
+				$res['OrderUsed'] = number($used, 2);
+				$res['CreditBalance'] = number($credit->CreditLine - ($credit->Balance + $credit->DNotesBal + $credit->OrdersBal + $used), 2);
+			}
+		}
+
+		$arr = array(
+			'status' => $sc === TRUE ? 'success' : 'error',
+			'message' => $sc === TRUE ? 'success' : $this->error,
+			'data' => $res
+		);
+
+		echo json_encode($arr);
 	}
 
 	public function get_reserve_balance()
@@ -545,7 +586,7 @@ class Orders extends PS_Controller
 									$status = $hd->saveType == 1 ? -1 : ($hd->saveType == 2 ? 4 : ($mustApprove == 1 ? 0 : 1));
 									//--- Approved: P = pending, S = approved by system, A = approved, R = rejected
 									$approved = ($hd->saveType == 1 or $hd->saveType == 2) ? 'P' : ($mustApprove == 1 ? 'P' : 'S');
-									
+
 									$arr = array(
 										'CardCode' => $customer->CardCode,
 										'CardName' => $customer->CardName,
@@ -823,7 +864,7 @@ class Orders extends PS_Controller
 				//--- ตรวจสอบสิทธิ์ในการอนุาัติ
 				$approver_id = $this->approver_model->is_approver($this->_user->id, $doc->sale_team);
 
-				if (! empty($approver_id) OR $this->_SuperAdmin)
+				if (! empty($approver_id) or $this->_SuperAdmin)
 				{
 					$can_approve = TRUE;
 
@@ -884,15 +925,15 @@ class Orders extends PS_Controller
 							$rowCount = 0;
 							$totalCost = 0;
 
-							if( ! empty($details))
+							if (! empty($details))
 							{
-								foreach($details as $rs)
+								foreach ($details as $rs)
 								{
 									$gp = 0;
-									$cost = round($this->products_model->get_sap_item_avg_cost($rs->ItemCode) ?? 0, 2);									
+									$cost = round($this->products_model->get_sap_item_avg_cost($rs->ItemCode) ?? 0, 2);
 									$margin = $rs->SellPrice - $cost;
-									if($cost > 0 && $margin > 0 && $rs->SellPrice > 0) $gp = round(($margin / $rs->SellPrice) * 100, 2);
-									if($cost > 0 && $margin < 0) $gp = round(($margin / $cost) * 100, 2);
+									if ($cost > 0 && $margin > 0 && $rs->SellPrice > 0) $gp = round(($margin / $rs->SellPrice) * 100, 2);
+									if ($cost > 0 && $margin < 0) $gp = round(($margin / $cost) * 100, 2);
 									$totalGp += $gp;
 									$totalCost += round($cost * $rs->Qty, 2);
 									$rowCount++;
@@ -990,8 +1031,8 @@ class Orders extends PS_Controller
 			if ($order->Status == 0 && $order->Approved == 'P' && $order->DocNum === NULL)
 			{
 				$approver_id = $this->approver_model->is_approver($this->_user->id, $order->sale_team);
-				
-				if (! empty($approver_id) OR $this->_SuperAdmin)
+
+				if (! empty($approver_id) or $this->_SuperAdmin)
 				{
 					$arr = array(
 						'Approved' => 'R',
@@ -1088,10 +1129,10 @@ class Orders extends PS_Controller
 					$rs->master_pack = !empty($pd) ? ac_format($pd->min_order_qty, 2) : '-';
 					$totalAmount += $rs->LineTotal;
 					$rs->Cost = $order->Status == 0 ? $this->products_model->get_sap_item_avg_cost($rs->ItemCode) : $rs->Cost;
-					$margin = $rs->SellPrice - $rs->Cost;					
+					$margin = $rs->SellPrice - $rs->Cost;
 					$rs->gp = 0;
-					if($rs->Cost > 0 && $margin > 0 && $rs->SellPrice > 0) $rs->gp = round(($margin / $rs->SellPrice) * 100, 2);
-					if($margin < 0 && $rs->Cost > 0) $rs->gp = round(($margin / $rs->Cost) * 100, 2);
+					if ($rs->Cost > 0 && $margin > 0 && $rs->SellPrice > 0) $rs->gp = round(($margin / $rs->SellPrice) * 100, 2);
+					if ($margin < 0 && $rs->Cost > 0) $rs->gp = round(($margin / $rs->Cost) * 100, 2);
 					$totalGp += $rs->gp;
 					$rowsCount++;
 					$totalCost += $rs->Cost;
@@ -1121,7 +1162,7 @@ class Orders extends PS_Controller
 
 					$no++;
 				}
-			}		
+			}
 
 			$ds = array(
 				'order' => $order,
@@ -1413,7 +1454,7 @@ class Orders extends PS_Controller
 
 				if ($sc === TRUE && ! empty($details))
 				{
-					$totalCost = 0;					
+					$totalCost = 0;
 					$LineNum = 0;
 					foreach ($details as $rs)
 					{
@@ -1421,11 +1462,11 @@ class Orders extends PS_Controller
 						{
 							break;
 						}
-						
+
 						$cost = $this->products_model->get_sap_item_avg_cost($rs->ItemCode);
 						$lineCost = $cost * $rs->Qty;
 						$totalCost += $lineCost;
-												
+
 						$arr = array(
 							'order_code' => $code,
 							'LineNum' => $LineNum,
@@ -1465,10 +1506,10 @@ class Orders extends PS_Controller
 							'policy_id' => $rs->policy_id,
 							'rule_id' => $rs->rule_id,
 							'WhsCode' => $rs->WhsCode,
-							'QuotaNo' => $rs->QuotaNo,							
+							'QuotaNo' => $rs->QuotaNo,
 							'uid' => $rs->uid,
-							'parent_uid' => $rs->parent_uid,							
-							'discType' => $rs->discType,							
+							'parent_uid' => $rs->parent_uid,
+							'discType' => $rs->discType,
 							'channels_id' => $rs->channels_id,
 							'payment_id' => $rs->payment_id,
 							'product_id' => $rs->product_id,
@@ -1499,7 +1540,7 @@ class Orders extends PS_Controller
 					//---- calculate total GP on header
 					$totalAfterDisc = $hd->DocTotal - $hd->VatSum;
 					$margin = $totalAfterDisc - $totalCost;
-					$totalGP = $totalAfterDisc != 0 ? round(($margin/$totalAfterDisc) * 100, 2) : 0;
+					$totalGP = $totalAfterDisc != 0 ? round(($margin / $totalAfterDisc) * 100, 2) : 0;
 
 					$arr = [
 						"totalCost" => $totalCost,
@@ -1511,14 +1552,14 @@ class Orders extends PS_Controller
 
 				if ($sc === TRUE)
 				{
-					$this->db->trans_commit();					
+					$this->db->trans_commit();
 				}
 				else
 				{
 					$this->db->trans_rollback();
 				}
 
-				if($sc === TRUE)
+				if ($sc === TRUE)
 				{
 					$arr = array(
 						'code' => $code,
@@ -2402,7 +2443,7 @@ class Orders extends PS_Controller
 		$payment = $this->input->post('Payment');
 		$whsCode = getConfig('DEFAULT_WAREHOUSE');
 		$quotaNo = $this->_user->quota_no;
-		
+
 		$file = isset($_FILES['uploadFile']) ? $_FILES['uploadFile'] : FALSE;
 		$ds = array(); //---- ไว้เก็บรายการสินค้า
 
@@ -2431,11 +2472,11 @@ class Orders extends PS_Controller
 			{
 				$info = $this->upload->data();
 				$reader = new Reader();
-				$reader->open($info['full_path']);		
+				$reader->open($info['full_path']);
 
 				$sheet	= $reader->getSheetIterator()->current();
 				$rows = []; //--- เก็บข้อมูลแต่ละแถวจากไฟล์ Excel
-				
+
 				if (empty($sheet))
 				{
 					$sc = FALSE;
@@ -2446,10 +2487,10 @@ class Orders extends PS_Controller
 				{
 					$totalRows = 0;
 					$isFirstRow = TRUE;
-					
-					foreach($sheet->getRowIterator() as $row)
+
+					foreach ($sheet->getRowIterator() as $row)
 					{
-						if($isFirstRow)
+						if ($isFirstRow)
 						{
 							$isFirstRow = FALSE;
 							continue;
@@ -2464,18 +2505,18 @@ class Orders extends PS_Controller
 					}
 				}
 
-				if($sc === TRUE && $totalRows > 0)
+				if ($sc === TRUE && $totalRows > 0)
 				{
-					foreach($rows as $item)
+					foreach ($rows as $item)
 					{
 						$code = $item->code;
 						$qty = $item->qty;
 
-						if(! empty($code))
+						if (! empty($code))
 						{
 							$pd = $this->products_model->get($code);
 
-							if(!empty($pd))
+							if (!empty($pd))
 							{
 								$res = $this->getItemData($pd, $cardCode, $docDate, $payment, $channels, $whsCode, $quotaNo, $qty);
 
@@ -2491,7 +2532,7 @@ class Orders extends PS_Controller
 								}
 							}
 						}
-					}					
+					}
 				} //--- $sc
 			}
 		}

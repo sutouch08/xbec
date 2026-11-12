@@ -45,7 +45,7 @@
     <td class="middle">{{name}}</td>
     <td class="middle text-right">{{price}}</td>
     <td class="middle text-right">
-      <input type="number" class="form-control input-xs text-right net-price" data-id="{{id}}" data-code="{{code}}" value="{{sell_price}}" />
+      <input type="number" class="form-control input-xs text-right net-price" data-id="{{id}}" data-code="{{code}}" value="{{sellPrice}}" />
     </td>
     <td class="middle text-center">
       <a href="javascript:void(0)" class="red" onclick="removeNetPriceItem('{{id}}')" title="Remove this row"><i class="fa fa-times fa-lg"></i></a>      
