@@ -8,7 +8,7 @@
 	<div class="divider-hidden">
 
 	</div>
-	<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 border-1 table-responsive" style="padding:0px; margin-left:5px; height:400px; overflow:auto;">
+	<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 border-1 table-responsive" style="padding:0px; margin-left:5px; min-height:300px; overflow:auto;">
 		<table class="table table-bordered border-1 tableFixHead table-narrow" style="min-width:2080px;">
 			<thead>
 				<tr class="freez">
