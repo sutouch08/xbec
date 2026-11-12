@@ -56,11 +56,11 @@
 					<th class="fix-width-40 text-center">#</th>
 					<th class="fix-width-80">Date</th>
 					<th class="fix-width-100">Web No.</th>
-					<th class="fix-width-300">Customer</th>
+					<th class="min-width-200">Customer</th>
 					<th class="fix-width-100">User</th>
 					<th class="fix-width-50 text-center">Status</th>					
 					<th class="fix-width-100">Item Code</th>
-					<th class="min-width-200">Item Desc.</th>					
+					<th class="fix-width-300">Item Desc.</th>					
 					<th class="fix-width-100 text-right">Qty.</th>
 					<th class="fix-width-100 text-right">Amount</th>
 					<th class="fix-width-20"></th>
